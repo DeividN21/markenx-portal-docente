@@ -15,6 +15,9 @@ import { StudentList, StudentCreate, StudentEdit } from "./resources/students/St
 // Componentes de Escenarios
 import { ScenarioList, ScenarioCreate, ScenarioEdit } from "./resources/scenarios/Scenarios";
 
+// Componentes de Tareas
+import { TaskList, TaskCreate, TaskEdit } from "./resources/tasks/Tasks";
+
 const i18nProvider = polyglotI18nProvider(() => spanishMessages, "es");
 
 const App = () => (
@@ -50,6 +53,14 @@ const App = () => (
       create={ScenarioCreate} 
       edit={ScenarioEdit}
       options={{ label: 'Diseñador de Escenarios' }} 
+    />
+
+    <Resource 
+      name="tasks" 
+      list={TaskList} 
+      create={TaskCreate} 
+      edit={TaskEdit}
+      options={{ label: 'Tareas' }} 
     />
     
   </Admin>
