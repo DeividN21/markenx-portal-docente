@@ -5,8 +5,12 @@ import { dataProvider } from "./providers/dataProvider";
 
 // Componentes de Periodos
 import { AcademicTermList, AcademicTermCreate, AcademicTermEdit } from "./resources/academic-terms/AcademicTerms";
+
 // Componentes de Cursos
 import { CourseList, CourseCreate, CourseEdit } from "./resources/courses/Courses";
+
+// Componentes de Estudiantes
+import { StudentList, StudentCreate, StudentEdit } from "./resources/students/Students";
 
 const i18nProvider = polyglotI18nProvider(() => spanishMessages, "es");
 
@@ -21,7 +25,6 @@ const App = () => (
       options={{ label: 'Períodos' }}
     />
 
-    {/* Actualización: */}
     <Resource 
       name="courses" 
       list={CourseList} 
@@ -30,7 +33,13 @@ const App = () => (
       options={{ label: 'Cursos' }} 
     />
 
-    <Resource name="students" list={ListGuesser} options={{ label: 'Estudiantes' }} />
+    <Resource 
+      name="students" 
+      list={StudentList} 
+      create={StudentCreate} 
+      edit={StudentEdit}
+      options={{ label: 'Estudiantes' }} 
+    />
     
   </Admin>
 );
