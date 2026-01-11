@@ -3,15 +3,16 @@ import polyglotI18nProvider from "ra-i18n-polyglot";
 import spanishMessages from "ra-language-spanish";
 import { dataProvider } from "./providers/dataProvider";
 
-// Importar componentes visuales
+// Componentes de Periodos
 import { AcademicTermList, AcademicTermCreate, AcademicTermEdit } from "./resources/academic-terms/AcademicTerms";
+// Componentes de Cursos
+import { CourseList, CourseCreate, CourseEdit } from "./resources/courses/Courses";
 
 const i18nProvider = polyglotI18nProvider(() => spanishMessages, "es");
 
 const App = () => (
   <Admin dataProvider={dataProvider} i18nProvider={i18nProvider}>
     
-    {/* Se conectan los componentes reales aquí: */}
     <Resource 
       name="academic-terms" 
       list={AcademicTermList} 
@@ -20,8 +21,15 @@ const App = () => (
       options={{ label: 'Períodos' }}
     />
 
-    {/* Estos siguen en modo "adivinanza" por ahora */}
-    <Resource name="courses" list={ListGuesser} options={{ label: 'Cursos' }} />
+    {/* Actualización: */}
+    <Resource 
+      name="courses" 
+      list={CourseList} 
+      create={CourseCreate} 
+      edit={CourseEdit}
+      options={{ label: 'Cursos' }} 
+    />
+
     <Resource name="students" list={ListGuesser} options={{ label: 'Estudiantes' }} />
     
   </Admin>
