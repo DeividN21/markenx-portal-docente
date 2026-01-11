@@ -3,6 +3,10 @@ import polyglotI18nProvider from "ra-i18n-polyglot";
 import spanishMessages from "ra-language-spanish";
 import { dataProvider } from "./providers/dataProvider";
 
+// Imports de Autenticación
+import { authProvider } from "./auth/authProvider";
+import LoginPage from "./auth/LoginPage";
+
 // Componentes de Periodos
 import { AcademicTermList, AcademicTermCreate, AcademicTermEdit } from "./resources/academic-terms/AcademicTerms";
 
@@ -21,7 +25,13 @@ import { TaskList, TaskCreate, TaskEdit } from "./resources/tasks/Tasks";
 const i18nProvider = polyglotI18nProvider(() => spanishMessages, "es");
 
 const App = () => (
-  <Admin dataProvider={dataProvider} i18nProvider={i18nProvider}>
+  <Admin 
+    dataProvider={dataProvider} 
+    authProvider={authProvider}
+    loginPage={LoginPage}
+    i18nProvider={i18nProvider}
+    requireAuth
+  >
     
     <Resource 
       name="academic-terms" 
