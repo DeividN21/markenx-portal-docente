@@ -3,7 +3,7 @@ import { HttpError } from "react-admin";
 import type { AuthProvider } from "react-admin";
 
 export const authProvider: AuthProvider = {
-  // 1. LOGIN: Aquí es donde se enviarán las credenciales a Keycloak
+  // 1. LOGIN: Aquí es donde se enviarán las credenciales a Keycloak 
   login: async ({ username, password }) => {
     console.log("Intentando login con:", username);
 
