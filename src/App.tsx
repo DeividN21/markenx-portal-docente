@@ -3,6 +3,16 @@ import polyglotI18nProvider from "ra-i18n-polyglot";
 import spanishMessages from "ra-language-spanish";
 import { dataProvider } from "./providers/dataProvider";
 
+// Imports de Iconos
+import SchoolIcon from '@mui/icons-material/School';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import GroupIcon from '@mui/icons-material/Group';
+import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+
+// Import de tema
+import { markenxTheme } from './theme';
+
 // Imports de Autenticación
 import { authProvider } from "./auth/authProvider";
 import LoginPage from "./auth/LoginPage";
@@ -25,7 +35,8 @@ import { TaskList, TaskCreate, TaskEdit } from "./resources/tasks/Tasks";
 const i18nProvider = polyglotI18nProvider(() => spanishMessages, "es");
 
 const App = () => (
-  <Admin 
+  <Admin
+    theme={markenxTheme}
     dataProvider={dataProvider} 
     authProvider={authProvider}
     loginPage={LoginPage}
@@ -39,6 +50,7 @@ const App = () => (
       create={AcademicTermCreate} 
       edit={AcademicTermEdit}
       options={{ label: 'Períodos' }}
+      icon={CalendarMonthIcon}
     />
 
     <Resource 
@@ -46,7 +58,8 @@ const App = () => (
       list={CourseList} 
       create={CourseCreate} 
       edit={CourseEdit}
-      options={{ label: 'Cursos' }} 
+      options={{ label: 'Cursos' }}
+      icon={SchoolIcon}
     />
 
     <Resource 
@@ -54,7 +67,8 @@ const App = () => (
       list={StudentList} 
       create={StudentCreate} 
       edit={StudentEdit}
-      options={{ label: 'Estudiantes' }} 
+      options={{ label: 'Estudiantes' }}
+      icon={GroupIcon}
     />
 
     <Resource 
@@ -62,7 +76,8 @@ const App = () => (
       list={ScenarioList} 
       create={ScenarioCreate} 
       edit={ScenarioEdit}
-      options={{ label: 'Diseñador de Escenarios' }} 
+      options={{ label: 'Diseñador de Escenarios' }}
+      icon={VideogameAssetIcon}
     />
 
     <Resource 
@@ -70,7 +85,8 @@ const App = () => (
       list={TaskList} 
       create={TaskCreate} 
       edit={TaskEdit}
-      options={{ label: 'Tareas' }} 
+      options={{ label: 'Tareas' }}
+      icon={AssignmentIcon}
     />
     
   </Admin>

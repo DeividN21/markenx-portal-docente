@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useLogin, useNotify, Notification } from 'react-admin';
-import { Button, Card, CardActions, CircularProgress, TextField, Typography, Box } from '@mui/material';
+import { Button, Card, CircularProgress, TextField, Typography, Box, InputAdornment } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
+import EmailIcon from '@mui/icons-material/Email';
+import SchoolIcon from '@mui/icons-material/School';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -13,10 +15,9 @@ const LoginPage = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        // Se llama al authProvider.login
         login({ username: email, password })
             .catch(() => {
-                notify('Usuario o contraseña incorrectos');
+                notify('Credenciales incorrectas');
                 setLoading(false);
             });
     };
@@ -29,33 +30,55 @@ const LoginPage = () => {
                 minHeight: '100vh',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#f5f5f5',
+                // Fondo Degradado
+                background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+                backgroundSize: 'cover',
             }}
         >
-            <Card sx={{ minWidth: 350, maxWidth: 400, padding: 3, boxShadow: 3 }}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
-                    {/* Logo Simulado o Icono */}
-                    <Box sx={{ m: 1, bgcolor: 'primary.main', borderRadius: '50%', p: 1 }}>
-                        <LockIcon sx={{ color: 'white' }} />
+            <Card sx={{ 
+                minWidth: 380, 
+                maxWidth: 450, 
+                padding: 4, 
+                borderRadius: 4,
+                boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.2)',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(10px)'
+            }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4 }}>
+                    <Box sx={{ 
+                        m: 1, 
+                        bgcolor: 'primary.main', 
+                        borderRadius: 3, 
+                        p: 1.5,
+                        boxShadow: '0 4px 6px -1px rgb(37 99 235 / 0.3)'
+                    }}>
+                        <SchoolIcon sx={{ color: 'white', fontSize: 40 }} />
                     </Box>
-                    <Typography component="h1" variant="h5" fontWeight="bold">
-                        MarkenX Admin
+                    <Typography component="h1" variant="h4" fontWeight="800" color="primary.dark">
+                        MarkenX
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Sistema de Gestión Académica
+                    <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+                        Portal del Docente
                     </Typography>
                 </Box>
                 
                 <form onSubmit={handleSubmit}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                         <TextField
-                            label="Email"
+                            label="Correo Institucional"
                             type="email"
                             value={email}
                             onChange={e => setEmail(e.target.value)}
                             fullWidth
                             required
                             placeholder="admin@markenx.com"
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <EmailIcon color="action" />
+                                    </InputAdornment>
+                                ),
+                            }}
                         />
                         <TextField
                             label="Contraseña"
@@ -64,22 +87,38 @@ const LoginPage = () => {
                             onChange={e => setPassword(e.target.value)}
                             fullWidth
                             required
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <LockIcon color="action" />
+                                    </InputAdornment>
+                                ),
+                            }}
                         />
                         
-                        <CardActions sx={{ padding: 0, marginTop: 1 }}>
-                            <Button
-                                variant="contained"
-                                type="submit"
-                                color="primary"
-                                fullWidth
-                                disabled={loading}
-                                size="large"
-                            >
-                                {loading ? <CircularProgress size={24} color="inherit" /> : 'Iniciar Sesión'}
-                            </Button>
-                        </CardActions>
+                        <Button
+                            variant="contained"
+                            type="submit"
+                            fullWidth
+                            disabled={loading}
+                            size="large"
+                            sx={{ 
+                                mt: 2, 
+                                py: 1.5,
+                                fontSize: '1.1rem',
+                                boxShadow: '0 4px 6px -1px rgb(37 99 235 / 0.4)'
+                            }}
+                        >
+                            {loading ? <CircularProgress size={26} color="inherit" /> : 'Acceder al Portal'}
+                        </Button>
                     </Box>
                 </form>
+                
+                <Box sx={{ mt: 4, textAlign: 'center' }}>
+                    <Typography variant="caption" color="text.disabled">
+                        © 2026 MarkenX Simulation System
+                    </Typography>
+                </Box>
             </Card>
             <Notification />
         </Box>
