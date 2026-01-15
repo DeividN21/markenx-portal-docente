@@ -1,73 +1,61 @@
-# React + TypeScript + Vite
+# MarkenX - Portal del Docente 🎓
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este repositorio contiene el **Frontend Administrativo** para el sistema educativo de simulación de marketing **MarkenX**. Está construido sobre **React Admin** y permite al docente gestionar cursos, estudiantes y configurar los escenarios del videojuego.
 
-Currently, two official plugins are available:
+## 🚀 Tecnologías
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Framework:** React Admin (v5) + React (v18)
+- **Build Tool:** Vite
+- **Lenguaje:** TypeScript
+- **Estilos:** Material UI (MUI)
+- **Iconos:** MUI Icons
 
-## React Compiler
+## 📋 Módulos Implementados
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1.  **Gestión Académica:**
+    - CRUD de Periodos Académicos.
+    - CRUD de Cursos (vinculados a periodos).
+    - Gestión de Estudiantes (con soporte para carga masiva visual).
 
-## Expanding the ESLint configuration
+2.  **Diseñador de Escenarios (Game Config):**
+    - Interfaz visual para crear JSONs complejos de configuración del juego.
+    - Gestión de Dimensiones, Consumidores, Acciones y Eventos.
+    - Validación de reglas de negocio (rangos 0.0 - 1.0).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+3.  **Gestión de Tareas:**
+    - Creación de Asignaciones (Múltiples intentos) y Evaluaciones (Intento único).
+    - Vinculación de Escenarios a Cursos.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+4.  **Monitor de Desempeño:**
+    - Vista jerárquica: Periodo -> Curso -> Estudiante -> Tarea.
+    - Visualización de reportes de partida (KPIs, Historial turno a turno).
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🛠️ Instalación y Ejecución
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1.  **Clonar el repositorio:**
+    ```bash
+    git clone [https://github.com/TU_USUARIO/markenx-portal-docente.git](https://github.com/TU_USUARIO/markenx-portal-docente.git)
+    cd markenx-portal-docente
+    ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2.  **Instalar dependencias:**
+    ```bash
+    npm install
+    ```
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+3.  **Ejecutar en modo desarrollo:**
+    ```bash
+    npm run dev
+    ```
+    El portal estará disponible en `http://localhost:5173`.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## ⚙️ Configuración de Entorno (Mock vs Real)
+
+El proyecto cuenta con un sistema de "Switch" para cambiar entre datos falsos (para desarrollo de UI) y la API real.
+
+- Mirar el archivo `.env` para configurar:
+  - `VITE_USE_MOCK`: `true` para desarrollo, `false` para producción.
+  - `VITE_API_URL`: URL de tu backend Spring Boot.
+  - `VITE_KEYCLOAK_URL`: URL de autenticación.
+
+> Para más detalles sobre la integración con el Backend y Unity, revisar la carpeta `/docs`.
