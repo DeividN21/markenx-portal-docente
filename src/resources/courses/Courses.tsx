@@ -22,16 +22,15 @@ const validateRequired = [required()];
 export const CourseList = () => (
     <List title="Cursos">
         <Datagrid rowClick="edit">
-            {/* Campo simple de texto */}
             <TextField source="name" label="Nombre del Curso" />
-            <TextField source="code" label="Código" />
+            {/* El backend no envía 'code' ni 'lifecycleStatus' en la lista, se quita temporalmente */}
+            {/* <TextField source="code" label="Código" /> */}
             
-            {/* ReferenceField busca el ID en 'academic-terms' y muestra su 'name' */}
-            <ReferenceField source="academic_term_id" reference="academic-terms" label="Periodo Académico">
+            <ReferenceField source="academicTermId" reference="academic-terms" label="Periodo">
                 <TextField source="name" />
             </ReferenceField>
 
-            <ChipField source="lifecycle_status" label="Estado" />
+            {/* <ChipField source="lifecycleStatus" label="Estado" /> */}
 
             <EditButton />
             <DeleteButton />
@@ -47,12 +46,12 @@ export const CourseCreate = () => (
             <TextInput source="code" label="Código Interno (Ej: 101)" validate={validateRequired} />
             
             {/* SELECTOR DE PERIODO ACADÉMICO */}
-            <ReferenceInput source="academic_term_id" reference="academic-terms" label="Periodo Académico">
-                <SelectInput optionText="name" validate={validateRequired} fullWidth />
+            <ReferenceInput source="academicTermId" reference="academic-terms" label="Periodo Académico">
+                <SelectInput optionText="label" validate={validateRequired} fullWidth />
             </ReferenceInput>
 
             <SelectInput 
-                source="lifecycle_status" 
+                source="lifecycleStatus" 
                 label="Estado" 
                 choices={[
                     { id: 'ACTIVE', name: 'Activo' },
@@ -76,13 +75,13 @@ export const CourseEdit = () => (
             <TextInput source="id" disabled />
             <TextInput source="name" label="Nombre del Curso" fullWidth validate={validateRequired} />
             <TextInput source="code" label="Código" validate={validateRequired} />
-            
-            <ReferenceInput source="academic_term_id" reference="academic-terms" label="Periodo Académico">
-                <SelectInput optionText="name" validate={validateRequired} fullWidth />
+
+            <ReferenceInput source="academicTermId" reference="academic-terms" label="Periodo Académico">
+                <SelectInput optionText="label" validate={validateRequired} fullWidth />
             </ReferenceInput>
 
             <SelectInput 
-                source="lifecycle_status" 
+                source="lifecycleStatus" 
                 label="Estado" 
                 choices={[
                     { id: 'ACTIVE', name: 'Activo' },

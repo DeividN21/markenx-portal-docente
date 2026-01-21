@@ -43,17 +43,15 @@ import { CreateButton } from 'react-admin';
 export const StudentList = () => (
     <List title="Estudiantes" actions={<StudentListActions />}>
         <Datagrid rowClick="edit">
-            <TextField source="first_name" label="Nombres" />
-            <TextField source="last_name" label="Apellidos" />
+            {/* El backend envía 'fullName', no 'firstName'/'lastName' separados */}
+            <TextField source="fullName" label="Nombre Completo" />
             <EmailField source="email" label="Email" />
             
-            {/* A qué curso pertenece */}
-            <ReferenceField source="course_id" reference="courses" label="Curso Asignado">
-                <TextField source="name" />
-            </ReferenceField>
+            {/* El backend NO envía 'courseId' en la lista, así que se quita esta columna o saldrá vacía */}
+            {/* <ReferenceField source="courseId" reference="courses" label="Curso" /> */}
 
-            {/* Estado coloreado */}
-            <ChipField source="status" label="Estado" />
+            {/* Tampoco envía 'status' */}
+            {/* <ChipField source="status" label="Estado" /> */}
 
             <EditButton />
             <DeleteButton />
@@ -65,12 +63,12 @@ export const StudentList = () => (
 export const StudentCreate = () => (
     <Create title="Registrar Estudiante" redirect="list">
         <SimpleForm>
-            <TextInput source="first_name" label="Nombres" fullWidth validate={validateRequired} />
-            <TextInput source="last_name" label="Apellidos" fullWidth validate={validateRequired} />
+            <TextInput source="firstName" label="Nombres" fullWidth validate={validateRequired} />
+            <TextInput source="lastName" label="Apellidos" fullWidth validate={validateRequired} />
             <TextInput source="email" label="Correo Institucional" fullWidth validate={validateEmail} type="email" />
             
             {/* Seleccionar el curso */}
-            <ReferenceInput source="course_id" reference="courses" label="Curso">
+            <ReferenceInput source="courseId" reference="courses" label="Curso">
                 <SelectInput optionText="name" validate={validateRequired} fullWidth />
             </ReferenceInput>
 
@@ -99,11 +97,11 @@ export const StudentEdit = () => (
     <Edit title={<StudentTitle />}>
         <SimpleForm>
             <TextInput source="id" disabled />
-            <TextInput source="first_name" label="Nombres" fullWidth validate={validateRequired} />
-            <TextInput source="last_name" label="Apellidos" fullWidth validate={validateRequired} />
+            <TextInput source="firstName" label="Nombres" fullWidth validate={validateRequired} />
+            <TextInput source="lastName" label="Apellidos" fullWidth validate={validateRequired} />
             <TextInput source="email" label="Correo" fullWidth validate={validateEmail} />
-            
-            <ReferenceInput source="course_id" reference="courses" label="Curso">
+
+            <ReferenceInput source="courseId" reference="courses" label="Curso">
                 <SelectInput optionText="name" validate={validateRequired} fullWidth />
             </ReferenceInput>
 
