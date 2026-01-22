@@ -1,77 +1,147 @@
 import { 
-    List, 
-    Datagrid, 
-    TextField, 
-    DateField, 
-    ChipField,
-    EditButton, 
-    DeleteButton,
-    Create,
-    Edit,
-    SimpleForm,
-    TextInput,
-    DateInput,
-    SelectInput,
-    required,
-    useRecordContext
+    List, Datagrid, TextField, DateField, ChipField, EditButton,
+    Create, Edit, SimpleForm, TextInput, DateInput, NumberInput, 
+    required, useRecordContext, useNotify, useRefresh, 
+    Toolbar, SaveButton
 } from "react-admin";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import Button from '@mui/material/Button';
 
-// VALIDACIONES & CONSTANTES
 const validateRequired = [required()];
 
-const statusChoices = [
-    { id: 'UPCOMING', name: 'Próximo (Upcoming)' },
-    { id: 'ACTIVE', name: 'Activo' },
-    { id: 'ARCHIVED', name: 'Archivado' },
-];
+const safeInt = (value: any) => {
+    const num = Number(value);
+    return isNaN(num) ? 0 : num;
+};
 
-// COMPONENTE: LISTA
+const transformData = (data: any) => ({
+    ...data,
+    academicYear: safeInt(data.academicYear),
+    academic_year: safeInt(data.academicYear),
+    year: safeInt(data.academicYear),
+    sequence: safeInt(data.sequence),
+    semester: safeInt(data.sequence),
+    startDate: data.startDate,
+    start_date: data.startDate,
+    endDate: data.endDate,
+    end_date: data.endDate,
+    status: data.status || "UPCOMING"
+});
+
+const ChangeStatusButton = () => {
+    const record = useRecordContext();
+    const notify = useNotify();
+    const refresh = useRefresh();
+    const apiUrl = import.meta.env.VITE_JSON_SERVER_URL;
+
+    if (!record) return null;
+
+    let label = "";
+    let newStatus = "";
+    let Icon = null;
+    let color: "primary" | "warning" = "primary";
+
+    if (record.status === 'UPCOMING') {
+        label = "Activar Periodo";
+        newStatus = "ACTIVE";
+        Icon = PlayArrowIcon;
+        color = "primary";
+    } else if (record.status === 'ACTIVE' || record.status === 'ENDED') {
+        label = "Archivar Periodo";
+        newStatus = "DISABLED";
+        Icon = ArchiveIcon;
+        color = "warning";
+    } else {
+        return null; 
+    }
+
+    const handleClick = async () => {
+        try {
+            const auth = JSON.parse(localStorage.getItem('auth') || "{}");
+            const token = auth.access_token || auth.accessToken || auth.token;
+
+            const response = await fetch(`${apiUrl}/academic-terms/${record.id}/status`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || `Error ${response.status}`);
+            }
+
+            notify(`Estado actualizado correctamente`, { type: 'success' });
+            refresh();
+        } catch (error: any) {
+            notify(`${error.message}`, { type: 'error', autoHideDuration: 6000 });
+        }
+    };
+
+    return (
+        <Button 
+            variant="contained" 
+            color={color} 
+            size="small" 
+            onClick={handleClick} 
+            startIcon={<Icon />} 
+            sx={{ ml: 2 }}
+        >
+            {label}
+        </Button>
+    );
+};
+
+const AcademicTermEditToolbar = () => (
+    <Toolbar>
+        <SaveButton />
+        <ChangeStatusButton />
+    </Toolbar>
+);
+
 export const AcademicTermList = () => (
     <List title="Periodos Académicos">
         <Datagrid rowClick="edit">
-            {/* El ID suele ser un UUID largo, mejor se muestra el Nombre como principal */}
-            <TextField source="label" label="Periodo" />
+            <TextField source="label" label="Periodo" /> 
             <DateField source="startDate" label="Fecha Inicio" />
             <DateField source="endDate" label="Fecha Fin" />
-
-            {/* ChipField muestra el estado con estilo de "etiqueta" */}
             <ChipField source="status" label="Estado" />
-            
             <EditButton label="Editar" />
-            <DeleteButton label="Borrar"/>
+            {/* ELIMINADO: DeleteButton porque el backend no soporta DELETE */}
         </Datagrid>
     </List>
 );
 
-// COMPONENTE: CREACIÓN
 export const AcademicTermCreate = () => (
-    <Create title="Crear Periodo Académico" redirect="list">
+    <Create title="Crear Periodo Académico" redirect="list" transform={transformData}>
         <SimpleForm>
-            <TextInput source="label" label="Nombre del Periodo (Ej: 1er Semestre - 2026)" fullWidth validate={validateRequired} />
-            <DateInput source="startDate" label="Fecha de Inicio" validate={validateRequired} />
-            <DateInput source="endDate" label="Fecha de Fin" validate={validateRequired} />
-            
-            {/* El estado inicial suele ser UPCOMING al crear */}
-            <SelectInput source="status" label="Estado Inicial" choices={statusChoices} defaultValue="UPCOMING" validate={validateRequired} />
+            <TextInput source="name" label="Nombre (Ej: 2026-1)" fullWidth validate={validateRequired} />
+            <div style={{ display: 'flex', gap: '20px' }}>
+                <NumberInput source="academicYear" label="Año (Ej: 2026)" validate={validateRequired} />
+                <NumberInput source="sequence" label="Secuencia (Ej: 1)" validate={validateRequired} />
+            </div>
+            <DateInput source="startDate" label="Fecha Inicio" validate={validateRequired} />
+            <DateInput source="endDate" label="Fecha Fin" validate={validateRequired} />
         </SimpleForm>
     </Create>
 );
 
-// COMPONENTE: EDICIÓN
-// Se reutiliza la lógica del formulario, pero se permite editar
-const AcademicTermTitle = () => {
-    const record = useRecordContext();
-    return <span>Periodo {record ? `"${record.label}"` : ''}</span>;
-};
-
 export const AcademicTermEdit = () => (
-    <Edit title={<AcademicTermTitle />}>
-        <SimpleForm>
-            <TextInput source="id" disabled label="ID (UUID)" />
-            <TextInput source="label" label="Nombre del Periodo" fullWidth validate={validateRequired} />
-            <DateInput source="start_date" label="Fecha de Inicio" validate={validateRequired} />
-            <DateInput source="end_date" label="Fecha de Fin" validate={validateRequired} />
-            <SelectInput source="status" label="Estado" choices={statusChoices} validate={validateRequired} />
+    <Edit title={<span />} transform={transformData}>
+        <SimpleForm toolbar={<AcademicTermEditToolbar />}>
+            <TextInput source="id" disabled label="ID" fullWidth />
+            <TextInput source="name" label="Nombre" fullWidth validate={validateRequired} />
+            <div style={{ display: 'flex', gap: '20px' }}>
+                <NumberInput source="academicYear" label="Año" validate={validateRequired} />
+                <NumberInput source="sequence" label="Secuencia" validate={validateRequired} />
+            </div>
+            <DateInput source="startDate" label="Fecha de Inicio" validate={validateRequired} />
+            <DateInput source="endDate" label="Fecha de Fin" validate={validateRequired} />
+            <ChipField source="status" label="Estado Actual" />
         </SimpleForm>
     </Edit>
 );
