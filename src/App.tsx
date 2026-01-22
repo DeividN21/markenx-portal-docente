@@ -7,9 +7,8 @@ import spanishMessages from "ra-language-spanish";
 import { dataProvider as mockDataProvider } from "./providers/dataProvider";
 import { restProvider } from "./providers/restProvider";
 
-// 2. IMPORT DEL AUTH PROVIDER (La lógica del switch está dentro de este archivo)
+// 2. IMPORT DEL AUTH PROVIDER
 import { authProvider } from "./auth/authProvider";
-import LoginPage from "./auth/LoginPage";
 import { markenxTheme } from './theme';
 
 // 3. IMPORTS DE ICONOS
@@ -39,11 +38,11 @@ const activeDataProvider = import.meta.env.VITE_USE_MOCK === 'true'
     : restProvider;
 
 const App = () => (
-  <Admin 
+  <Admin
     theme={markenxTheme}
-    dataProvider={activeDataProvider} 
+    dataProvider={activeDataProvider}
     authProvider={authProvider}
-    loginPage={LoginPage}
+    loginPage={false}
     i18nProvider={i18nProvider}
     requireAuth
   >

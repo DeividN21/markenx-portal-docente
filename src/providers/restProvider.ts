@@ -1,20 +1,15 @@
 import { fetchUtils } from "react-admin";
 import type { DataProvider } from "react-admin";
 
-const apiUrl = import.meta.env.VITE_JSON_SERVER_URL;
+const apiUrl = import.meta.env.VITE_API_URL;
 
+// Cliente HTTP con cookies de sesión (BFF)
 const httpClient = (url: string, options: any = {}) => {
     if (!options.headers) {
         options.headers = new Headers({ Accept: 'application/json' });
     }
-    const authString = localStorage.getItem('auth');
-    if (authString) {
-        const auth = JSON.parse(authString);
-        const token = auth.access_token || auth.accessToken || auth.token;
-        if (token) {
-            options.headers.set('Authorization', `Bearer ${token}`);
-        }
-    }
+    // Usar cookies de sesión en lugar de Bearer token
+    options.credentials = 'include';
     return fetchUtils.fetchJson(url, options);
 };
 

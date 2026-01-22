@@ -1,46 +1,91 @@
 import type { AuthProvider } from "react-admin";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const authProvider: AuthProvider = {
-  login: async ({ username, password }) => {
-    const request = new Request(
-      `${import.meta.env.VITE_JSON_SERVER_URL}/auth/login`,
-      {
-        method: "POST",
-        body: JSON.stringify({ email: username, password }),
-        headers: new Headers({ "Content-Type": "application/json" }),
-      }
-    );
-
-    try {
-      const response = await fetch(request);
-      if (response.status < 200 || response.status >= 300) {
-        throw new Error(response.statusText);
-      }
-      const auth = await response.json();
-      localStorage.setItem("auth", JSON.stringify(auth));
-      return Promise.resolve();
-    } catch (error) {
-      throw new Error("Error de autenticación: Credenciales inválidas");
-    }
-  },
-
-  logout: () => {
-    localStorage.removeItem("auth");
+  // Redirige al BFF para OAuth (no usa formulario local)
+  login: async () => {
+    window.location.href = `${API_URL}/auth/login`;
     return Promise.resolve();
   },
 
-  checkError: (error) => {
+  // Logout via POST form al BFF
+  logout: async () => {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = `${API_URL}/auth/logout`;
+
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "redirect_uri";
+    input.value = `${window.location.origin}/logged-out`;
+
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+
+    return Promise.resolve();
+  },
+
+  // Verifica sesión activa contra /auth/me
+  checkAuth: async () => {
+    try {
+      const response = await fetch(`${API_URL}/auth/me`, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("No autenticado");
+      }
+      return Promise.resolve();
+    } catch {
+      window.location.href = `${API_URL}/auth/login`;
+      return Promise.reject();
+    }
+  },
+
+  // Maneja errores de autorización
+  checkError: async (error) => {
     const status = error.status;
     if (status === 401 || status === 403) {
-      localStorage.removeItem("auth");
+      window.location.href = `${API_URL}/auth/login`;
       return Promise.reject();
     }
     return Promise.resolve();
   },
 
-  checkAuth: () => {
-    return localStorage.getItem("auth") ? Promise.resolve() : Promise.reject();
+  // Obtiene identidad del usuario para mostrar en UI
+  getIdentity: async () => {
+    try {
+      const response = await fetch(`${API_URL}/auth/me`, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Error obteniendo identidad");
+      }
+      const data = await response.json();
+      return {
+        id: data.userId || data.id,
+        fullName: data.fullName || data.name,
+        email: data.email,
+      };
+    } catch {
+      throw new Error("Error obteniendo identidad");
+    }
   },
 
-  getPermissions: () => Promise.resolve(),
+  // Obtiene permisos/roles del usuario
+  getPermissions: async () => {
+    try {
+      const response = await fetch(`${API_URL}/auth/me`, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        return [];
+      }
+      const data = await response.json();
+      return data.roles || [];
+    } catch {
+      return [];
+    }
+  },
 };
