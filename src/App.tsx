@@ -20,7 +20,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import BarChartIcon from '@mui/icons-material/BarChart';
 
 // 4. IMPORTS DE RECURSOS (VISTAS)
-import { AcademicTermList, AcademicTermCreate, AcademicTermEdit } from "./resources/academic-terms/AcademicTerms";
+import { AcademicTermList, AcademicTermCreate, AcademicTermEdit } from "./resources/terms/AcademicTerms";
 import { CourseList, CourseCreate, CourseEdit } from "./resources/courses/Courses";
 import { StudentList, StudentCreate, StudentEdit } from "./resources/students/Students";
 import { ScenarioList, ScenarioCreate, ScenarioEdit } from "./resources/scenarios/Scenarios";

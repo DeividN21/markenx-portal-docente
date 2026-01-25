@@ -111,7 +111,6 @@ export const AcademicTermList = () => (
             <DateField source="endDate" label="Fecha Fin" />
             <ChipField source="status" label="Estado" />
             <EditButton label="Editar" />
-            {/* ELIMINADO: DeleteButton porque el backend no soporta DELETE */}
         </Datagrid>
     </List>
 );
