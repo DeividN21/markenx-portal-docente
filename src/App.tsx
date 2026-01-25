@@ -23,9 +23,7 @@ import { StudentList, StudentCreate, StudentEdit } from "./resources/students/St
 import { ScenarioList, ScenarioCreate, ScenarioEdit } from "./resources/scenarios/Scenarios";
 import { TaskList, TaskCreate, TaskEdit } from "./resources/tasks/Tasks";
 import { PerformancePage } from "./pages/PerformancePage";
-import {TermList} from "./resources/terms/term.list.tsx";
-import {TermCreate} from "./resources/terms/term.create.tsx";
-import {TermEdit} from "./resources/terms/term.edit.tsx";
+import { TermList, TermCreate, TermEdit } from "./features/terms";
 
 // CONFIGURACIÓN
 
