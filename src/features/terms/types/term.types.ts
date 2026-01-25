@@ -28,11 +28,12 @@ export interface Term {
 
 /**
  * Datos del formulario de creación/edición
+ * Coincide con CreateTermRequestDTO del backend
  */
 export interface TermFormData {
-  label: string;
-  startDate: string;
-  endDate: string;
+  startDate: string; // YYYY-MM-DD
+  endDate: string;   // YYYY-MM-DD
+  year: number;      // Año del período
 }
 
 /**
@@ -42,4 +43,22 @@ export const TERM_STATUS_COLORS: Record<TermStatusCode, 'default' | 'primary' | 
   UPCOMING: 'info',
   ACTIVE: 'success',
   ENDED: 'default',
+};
+
+/**
+ * Calcula el año del período académico
+ * - Si las fechas están en el mismo año, retorna ese año
+ * - Si las fechas están en años diferentes, retorna el año de inicio por defecto
+ */
+export const calculatePeriodYear = (startDate: string, endDate: string): number => {
+  const startYear = new Date(startDate).getFullYear();
+  const endYear = new Date(endDate).getFullYear();
+  
+  // Si están en el mismo año, usar ese
+  if (startYear === endYear) {
+    return startYear;
+  }
+  
+  // Si son diferentes, usar el año de inicio
+  return startYear;
 };

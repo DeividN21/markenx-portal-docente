@@ -12,7 +12,7 @@ export { TermChangeStatusButton } from './components/TermChangeStatusButton';
 
 // Types
 export type { Term, TermFormData, TermStatus, TermStatusCode } from './types/term.types';
-export { TERM_STATUS_COLORS } from './types/term.types';
+export { TERM_STATUS_COLORS, calculatePeriodYear } from './types/term.types';
 
 // Services
 export { changeTermStatus } from './services/term.service';
