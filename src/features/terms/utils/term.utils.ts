@@ -1,18 +1,11 @@
-import type { Term, TermStatus } from '../types/term.types';
-import { TERM_STATUS_COLORS, TERM_STATUS_LABELS } from '../types/term.types';
+import type { Term, TermStatusCode } from '../types/term.types';
+import { TERM_STATUS_COLORS } from '../types/term.types';
 
 /**
- * Obtiene el color del chip para un estado de term
+ * Obtiene el color del chip para un código de estado
  */
-export const getStatusColor = (status: TermStatus): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
-  return TERM_STATUS_COLORS[status];
-};
-
-/**
- * Obtiene el label traducido para un estado de term
- */
-export const getStatusLabel = (status: TermStatus): string => {
-  return TERM_STATUS_LABELS[status];
+export const getStatusColor = (statusCode: TermStatusCode): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+  return TERM_STATUS_COLORS[statusCode];
 };
 
 /**
@@ -20,7 +13,7 @@ export const getStatusLabel = (status: TermStatus): string => {
  * Solo los terms con estado UPCOMING pueden ser editados
  */
 export const canEdit = (term: Term): boolean => {
-  return term.status === 'UPCOMING';
+  return term.status.code === 'UPCOMING';
 };
 
 /**
@@ -32,15 +25,15 @@ export const canChangeStatus = (_term: Term): boolean => {
 };
 
 /**
- * Obtiene los estados disponibles para transición desde el estado actual
+ * Obtiene los códigos de estado disponibles para transición desde el estado actual
  */
-export const getAvailableStatuses = (currentStatus: TermStatus): TermStatus[] => {
-  switch (currentStatus) {
+export const getAvailableStatuses = (currentStatusCode: TermStatusCode): TermStatusCode[] => {
+  switch (currentStatusCode) {
     case 'UPCOMING':
-      return ['ACTIVE', 'ARCHIVED'];
+      return ['ACTIVE', 'ENDED'];
     case 'ACTIVE':
-      return ['ARCHIVED'];
-    case 'ARCHIVED':
+      return ['ENDED'];
+    case 'ENDED':
       return ['ACTIVE']; // Puede reactivarse si es necesario
     default:
       return [];

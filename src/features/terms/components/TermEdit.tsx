@@ -1,6 +1,6 @@
 import { Edit, SimpleForm, TextInput, Toolbar, SaveButton, useRecordContext, useNotify } from 'react-admin';
 import { TermForm } from './TermForm';
-import { ChangeStatusButton } from '../../../components/shared/ChangeStatusButton';
+import { TermChangeStatusButton } from './TermChangeStatusButton';
 import type { Term } from '../types/term.types';
 import { canEdit } from '../utils/term.utils';
 
@@ -16,7 +16,7 @@ const TermEditToolbar = () => {
   return (
     <Toolbar>
       {canEditRecord && <SaveButton />}
-      <ChangeStatusButton resource="academic-terms" />
+      <TermChangeStatusButton />
     </Toolbar>
   );
 };
