@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit, TopToolbar } from 'react-admin';
+import { Edit, TopToolbar, useNotify } from 'react-admin';
 import { StudentForm } from './StudentForm';
 import { ChangeStatusButton } from '../../../components/shared/ChangeStatusButton';
 
@@ -18,8 +18,23 @@ const StudentEditToolbar: React.FC = () => {
  * Student edit component
  */
 export const StudentEdit: React.FC = () => {
+  const notify = useNotify();
+
   return (
-    <Edit title="Editar Estudiante" actions={<StudentEditToolbar />}>
+    <Edit 
+      title="Editar Estudiante" 
+      actions={<StudentEditToolbar />}
+      mutationMode="pessimistic"
+      mutationOptions={{
+        onError: (error) => {
+          const apiError = error as { body?: { userMessage?: string } };
+          notify(
+            apiError.body?.userMessage || 'Error al actualizar el estudiante',
+            { type: 'error' }
+          );
+        },
+      }}
+    >
       <StudentForm />
     </Edit>
   );
