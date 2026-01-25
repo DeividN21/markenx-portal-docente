@@ -44,7 +44,19 @@ export const TaskList = () => (
         <TextField source="title" />
       </ReferenceField>
 
-      <DateField source="deadline" label="Fecha Límite" showTime />
+      <DateField 
+        source="deadline" 
+        label="Fecha Límite" 
+        showTime 
+        locales="es-ES"
+        options={{ 
+          year: 'numeric', 
+          month: '2-digit', 
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        }}
+      />
       
       <FunctionField
         label="Nota Mínima"

@@ -14,8 +14,18 @@ export const TermList = () => (
   >
     <Datagrid rowClick="edit" bulkActionButtons={false}>
       <TextField source="label" label="Período" />
-      <DateField source="startDate" label="Fecha Inicio" />
-      <DateField source="endDate" label="Fecha Fin" />
+      <DateField 
+        source="startDate" 
+        label="Fecha Inicio" 
+        locales="es-ES"
+        options={{ year: 'numeric', month: '2-digit', day: '2-digit' }}
+      />
+      <DateField 
+        source="endDate" 
+        label="Fecha Fin" 
+        locales="es-ES"
+        options={{ year: 'numeric', month: '2-digit', day: '2-digit' }}
+      />
       <FunctionField
         label="Estado"
         render={(record: Term) => (
