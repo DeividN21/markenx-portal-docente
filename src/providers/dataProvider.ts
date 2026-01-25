@@ -1,77 +1,111 @@
-import fakeRestDataProvider from "ra-data-fakerest";
+/**
+ * Data Provider principal para React-Admin
+ * Usa el servicio CRUD genérico con tipos TypeScript estrictos
+ * 
+ * Nota sobre `any` en retornos: React-Admin usa genéricos complejos que dificultan
+ * el tipado estricto sin perder flexibilidad. Se usa `any` solo en las conversiones
+ * de tipo finales para cumplir con la interfaz DataProvider.
+ */
 
-const data = {
-  "academic-terms": [
-    { id: "at-1", name: "1er Semestre - 2026", start_date: "2026-03-01", end_date: "2026-07-01", status: "UPCOMING" },
-    { id: "at-2", name: "2do Semestre - 2025", start_date: "2025-09-01", end_date: "2026-02-01", status: "ACTIVE" },
-  ],
-  courses: [
-    { id: "c-1", name: "Marketing Estratégico A", code: 101, academic_term_id: "at-1", lifecycle_status: "ACTIVE" },
-    { id: "c-2", name: "Simulación de Negocios B", code: 102, academic_term_id: "at-2", lifecycle_status: "ACTIVE" },
-  ],
-  students: [
-    { id: "std-1", first_name: "Juan", last_name: "Pérez", email: "juan.perez@udla.edu.ec", course_id: "c-1", status: "ACTIVE" },
-    { id: "std-2", first_name: "María", last_name: "López", email: "maria.lopez@udla.edu.ec", course_id: "c-1", status: "ACTIVE" },
-    { id: "std-3", first_name: "Carlos", last_name: "Andrade", email: "carlos.a@udla.edu.ec", course_id: "c-2", status: "ACTIVE" },
-  ],
-  scenarios: [
-    {
-      id: "scn-1",
-      title: "Consumidor Ecológico",
-      description: "Escenario donde el mercado valora la sostenibilidad.",
-    }
-  ],
-  tasks: [
-    {
-      id: "tsk-1",
-      title: "Misión: Salvar el Planeta",
-      course_id: "c-1",
-      scenario_id: "scn-1",
-      deadline: "2026-06-15",
-      max_attempts: 3,
-      min_score_to_pass: 0.7
-    }
-  ],
-  // Resultados de partidas (Estructura basada en GameSessionReport de C#)
-  attempts: [
-    {
-      id: "att-1",
-      student_id: "std-1",
-      task_id: "tsk-1",
-      // Datos del GameSessionReport
-      sessionDate: "2026-01-14 10:30:00",
-      finalOutcome: "GANASTE",
-      finalAcceptance: 0.85,
-      remainingBudget: 450,
-      totalTurnsUsed: 5,
-      profileDiscoveryPercentage: 0.75,
-      // Historial Turno a Turno
-      history: [
-        { turnNumber: 1, acceptanceAtEnd: 0.20, budgetAtEnd: 1100, eventOcurredTitle: "", actionsTakenIds: ["act-pack-recycle"] },
-        { turnNumber: 2, acceptanceAtEnd: 0.45, budgetAtEnd: 900, eventOcurredTitle: "EL MUNDO SE VUELVE MÁS VERDE", actionsTakenIds: ["act-bio-mat"] },
-        { turnNumber: 3, acceptanceAtEnd: 0.60, budgetAtEnd: 750, eventOcurredTitle: "", actionsTakenIds: ["act-local"] },
-        { turnNumber: 4, acceptanceAtEnd: 0.78, budgetAtEnd: 550, eventOcurredTitle: "", actionsTakenIds: ["act-pub-social"] },
-        { turnNumber: 5, acceptanceAtEnd: 0.85, budgetAtEnd: 450, eventOcurredTitle: "", actionsTakenIds: ["act-pub-influ"] }
-      ]
-    },
-    {
-      id: "att-2",
-      student_id: "std-2",
-      task_id: "tsk-1",
-      sessionDate: "2026-01-15 09:00:00",
-      finalOutcome: "PERDISTE",
-      finalAcceptance: 0.65,
-      remainingBudget: 0, // Se quedó sin dinero
-      totalTurnsUsed: 4,
-      profileDiscoveryPercentage: 0.40,
-      history: [
-        { turnNumber: 1, acceptanceAtEnd: 0.10, budgetAtEnd: 800, eventOcurredTitle: "", actionsTakenIds: ["act-expensive"] },
-        { turnNumber: 2, acceptanceAtEnd: 0.30, budgetAtEnd: 400, eventOcurredTitle: "", actionsTakenIds: ["act-wrong"] },
-        { turnNumber: 3, acceptanceAtEnd: 0.50, budgetAtEnd: 100, eventOcurredTitle: "", actionsTakenIds: ["act-ads"] },
-        { turnNumber: 4, acceptanceAtEnd: 0.65, budgetAtEnd: 0, eventOcurredTitle: "", actionsTakenIds: [] }
-      ]
-    }
-  ]
+import type { DataProvider } from 'react-admin';
+import { crudService } from '../services/crud.service';
+import { normalizeEntity } from '../utils/normalizers';
+
+export const dataProvider: DataProvider = {
+  /**
+   * Obtener lista de recursos (paginada)
+   */
+  getList: async (resource, params) => {
+    return crudService.list(resource, {
+      page: params.pagination?.page || 1,
+      perPage: params.pagination?.perPage || 10,
+      sortField: params.sort?.field || 'id',
+      sortOrder: params.sort?.order || 'ASC',
+      filter: params.filter,
+    });
+  },
+
+  /**
+   * Obtener un recurso por ID
+   */
+  getOne: async (resource, params) => {
+    const data = await crudService.get(resource, params.id);
+    // @ts-ignore - Conflict entre genéricos de React-Admin y normalización
+    return { data: normalizeEntity(data as Record<string, unknown>) } as any;
+  },
+
+  /**
+   * Obtener múltiples recursos por IDs
+   */
+  getMany: async (resource, params) => {
+    const promises = params.ids.map((id) => crudService.get(resource, id));
+    const results = await Promise.all(promises);
+    // @ts-ignore - Conflict entre genéricos de React-Admin y normalización
+    return {
+      data: results.map((item) => normalizeEntity(item as Record<string, unknown>)),
+    } as any;
+  },
+
+  /**
+   * Obtener lista referenciada (ej: tareas de un curso)
+   */
+  getManyReference: async (resource, params) => {
+    return crudService.list(resource, {
+      page: params.pagination.page,
+      perPage: params.pagination.perPage,
+      sortField: params.sort.field,
+      sortOrder: params.sort.order,
+      filter: {
+        ...params.filter,
+        [params.target]: params.id,
+      },
+    });
+  },
+
+  /**
+   * Crear un recurso
+   */
+  create: async (resource, params) => {
+    const data = await crudService.create(resource, params.data);
+    // @ts-ignore - Conflict entre genéricos de React-Admin y normalización
+    return { data: normalizeEntity(data as Record<string, unknown>) } as any;
+  },
+
+  /**
+   * Actualizar un recurso
+   */
+  update: async (resource, params) => {
+    const data = await crudService.update(resource, params.id, params.data);
+    // @ts-ignore - Conflict entre genéricos de React-Admin y normalización
+    return { data: normalizeEntity(data as Record<string, unknown>) } as any;
+  },
+
+  /**
+   * Actualizar múltiples recursos
+   */
+  updateMany: async (resource, params) => {
+    const promises = params.ids.map((id) =>
+      crudService.update(resource, id, params.data)
+    );
+    await Promise.all(promises);
+    return { data: params.ids };
+  },
+
+  /**
+   * Eliminar un recurso
+   */
+  delete: async (resource, params) => {
+    await crudService.remove(resource, params.id);
+    // @ts-ignore - Conflict entre genéricos de React-Admin
+    return { data: { id: params.id } } as any;
+  },
+
+  /**
+   * Eliminar múltiples recursos
+   */
+  deleteMany: async (resource, params) => {
+    const promises = params.ids.map((id) => crudService.remove(resource, id));
+    await Promise.all(promises);
+    return { data: params.ids };
+  },
 };
-
-export const dataProvider = fakeRestDataProvider(data, true);

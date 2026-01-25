@@ -1,6 +1,6 @@
 import { 
     List, Datagrid, TextField, ReferenceField, ChipField, EditButton,
-    Create, SimpleForm, TextInput, SelectInput, ReferenceInput, required
+    Create, Edit, SimpleForm, TextInput, SelectInput, ReferenceInput, required
 } from "react-admin";
 
 const validateRequired = [required()];
