@@ -21,7 +21,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import { CourseList, CourseCreate, CourseEdit } from "./features/courses";
 import { StudentList, StudentCreate, StudentEdit } from "./resources/students/Students";
 import { ScenarioList, ScenarioCreate, ScenarioEdit } from "./resources/scenarios/Scenarios";
-import { TaskList, TaskCreate, TaskEdit } from "./resources/tasks/Tasks";
+import { TaskList, TaskCreate, TaskEdit } from "./features/tasks";
 import { PerformancePage } from "./pages/PerformancePage";
 import { TermList, TermCreate, TermEdit } from "./features/terms";
 
