@@ -20,7 +20,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 // 4. IMPORTS DE RECURSOS (VISTAS)
 import { CourseList, CourseCreate, CourseEdit } from "./features/courses";
 import { StudentList, StudentCreate, StudentEdit } from "./features/students";
-import { ScenarioList, ScenarioCreate, ScenarioEdit } from "./resources/scenarios/Scenarios";
+import { ScenarioList, ScenarioCreate, ScenarioEdit } from "./features/scenarios";
 import { TaskList, TaskCreate, TaskEdit } from "./features/tasks";
 import { PerformancePage } from "./pages/PerformancePage";
 import { TermList, TermCreate, TermEdit } from "./features/terms";
