@@ -1,9 +1,11 @@
 import { defaultTheme } from 'react-admin';
+import type { RaThemeOptions } from 'react-admin';
 
-export const markenxTheme = {
+export const markenxTheme: RaThemeOptions = {
     ...defaultTheme,
     palette: {
-        mode: 'light',
+        ...defaultTheme.palette,
+        mode: 'light' as const,
         primary: {
             main: '#2563eb',
             light: '#60a5fa',
