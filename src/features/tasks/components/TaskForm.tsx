@@ -6,11 +6,8 @@ import {
   NumberInput,
   required,
   minValue,
-  maxValue,
-  FormDataConsumer
+  maxValue
 } from 'react-admin';
-import { Box, Typography } from '@mui/material';
-import { getTaskType, TASK_TYPE_LABELS, TASK_TYPE_COLORS } from '../types/task.types';
 
 /**
  * Formulario compartido para crear/editar tareas
@@ -20,9 +17,11 @@ export const TaskForm = () => (
   <>
     <TextInput 
       source="title" 
-      label="Título de la Tarea" 
+      label="Título" 
       fullWidth 
       validate={required()}
+      helperText="Nombre corto y descriptivo de la tarea"
+      sx={{ mb: 2 }}
     />
     <TextInput 
       source="summary" 
@@ -31,30 +30,34 @@ export const TaskForm = () => (
       fullWidth 
       rows={3}
       helperText="Descripción detallada de lo que el estudiante debe lograr"
+      sx={{ mb: 2 }}
     />
     
     <ReferenceInput 
       source="courseId" 
       reference="courses" 
-      label="Asignar al Curso"
+      label="Curso"
     >
       <SelectInput 
         optionText="name" 
         validate={required()} 
-        fullWidth 
+        fullWidth
+        helperText="Curso al que pertenece esta tarea"
+        sx={{ mb: 2 }}
       />
     </ReferenceInput>
 
     <ReferenceInput 
       source="scenarioId" 
       reference="scenarios" 
-      label="Escenario de Juego"
+      label="Escenario"
     >
       <SelectInput 
         optionText="title" 
         validate={required()} 
-        fullWidth 
-        helperText="Selecciona el escenario que los estudiantes deberán jugar"
+        fullWidth
+        helperText="Escenario de juego que los estudiantes deberán completar"
+        sx={{ mb: 2 }}
       />
     </ReferenceInput>
 
@@ -63,6 +66,8 @@ export const TaskForm = () => (
       label="Fecha y Hora Límite" 
       validate={required()} 
       fullWidth
+      helperText="Fecha y hora máxima para completar la tarea"
+      sx={{ mb: 2 }}
     />
 
     <NumberInput
@@ -75,6 +80,7 @@ export const TaskForm = () => (
       validate={[required(), minValue(0), maxValue(1)]}
       fullWidth
       helperText="Valor entre 0.0 y 1.0 (se mostrará como porcentaje: 0.7 = 70%)"
+      sx={{ mb: 2 }}
     />
 
     <NumberInput
@@ -85,33 +91,7 @@ export const TaskForm = () => (
       validate={[required(), minValue(1)]}
       fullWidth
       helperText="1 intento = Evaluación | Múltiples intentos = Práctica"
+      sx={{ mb: 2 }}
     />
-
-    {/* Feedback visual dinámico sobre el tipo de tarea */}
-    <FormDataConsumer>
-      {({ formData }) => {
-        const maxAttempts = formData?.maxAttempts || 1;
-        const taskType = getTaskType(maxAttempts);
-        const backgroundColor = TASK_TYPE_COLORS[taskType];
-        const label = TASK_TYPE_LABELS[taskType];
-
-        return (
-          <Box
-            sx={{
-              padding: 2,
-              marginTop: -1,
-              marginBottom: 2,
-              backgroundColor,
-              borderRadius: 1,
-              border: '1px solid #e0e0e0',
-            }}
-          >
-            <Typography variant="body2" fontWeight="bold" color="text.primary">
-              Tipo de Tarea: {label}
-            </Typography>
-          </Box>
-        );
-      }}
-    </FormDataConsumer>
   </>
 );

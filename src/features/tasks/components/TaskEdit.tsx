@@ -1,14 +1,12 @@
 import { 
   Edit, 
   SimpleForm, 
-  TextInput, 
   Toolbar, 
   SaveButton,
   useRecordContext,
   useNotify 
 } from 'react-admin';
 import { TaskForm } from './TaskForm';
-import { ChangeStatusButton } from '../../../components/shared/ChangeStatusButton';
 import type { Task } from '../types/task.types';
 
 /**
@@ -17,7 +15,6 @@ import type { Task } from '../types/task.types';
 const TaskEditToolbar = () => (
   <Toolbar>
     <SaveButton />
-    <ChangeStatusButton resource="tasks" />
   </Toolbar>
 );
 
@@ -50,7 +47,6 @@ export const TaskEdit = () => {
       }}
     >
       <SimpleForm toolbar={<TaskEditToolbar />}>
-        <TextInput source="id" label="ID" disabled fullWidth />
         <TaskForm />
       </SimpleForm>
     </Edit>

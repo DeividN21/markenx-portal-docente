@@ -8,11 +8,8 @@ import {
   EditButton,
   FunctionField
 } from 'react-admin';
-import { Chip } from '@mui/material';
-import { StatusChip } from '../../../components/ui/StatusChip';
 import { formatScore } from '../../../utils/formatters';
 import type { Task } from '../types/task.types';
-import { getTaskType } from '../types/task.types';
 
 /**
  * Componente de lista de tareas
@@ -23,8 +20,27 @@ export const TaskList = () => (
     sort={{ field: 'deadline', order: 'DESC' }}
     perPage={25}
   >
-    <Datagrid rowClick="edit" bulkActionButtons={false}>
-      <TextField source="title" label="Título" sortable={false} />
+    <Datagrid 
+      rowClick={false} 
+      bulkActionButtons={false}
+      sx={{
+        '& .RaDatagrid-headerCell': {
+          textAlign: 'center',
+        },
+        '& .RaDatagrid-rowCell': {
+          textAlign: 'center',
+        }
+      }}
+    >
+      <FunctionField
+        label="Título"
+        sortable={false}
+        render={(record: Task) => (
+          record.title.length > 20 
+            ? `${record.title.substring(0, 20)}...` 
+            : record.title
+        )}
+      />
       
       <ReferenceField 
         source="courseId" 
@@ -43,7 +59,13 @@ export const TaskList = () => (
         link={false}
         sortable={false}
       >
-        <TextField source="title" />
+        <FunctionField
+          render={(record: any) => (
+            record.title && record.title.length > 20 
+              ? `${record.title.substring(0, 20)}...` 
+              : record.title
+          )}
+        />
       </ReferenceField>
 
       <DateField 
@@ -70,23 +92,10 @@ export const TaskList = () => (
       <NumberField source="maxAttempts" label="Intentos" sortable={false} />
       
       <FunctionField
-        label="Tipo"
-        render={(record: Task) => {
-          const taskType = getTaskType(record.maxAttempts);
-          return (
-            <Chip 
-              label={taskType === 'EVALUATION' ? 'Evaluación' : 'Práctica'}
-              color={taskType === 'EVALUATION' ? 'primary' : 'default'}
-              size="small"
-            />
-          );
-        }}
+        label="Acciones"
         sortable={false}
+        render={() => <EditButton />}
       />
-
-      <StatusChip source="status" label="Estado" />
-      
-      <EditButton />
     </Datagrid>
   </List>
 );

@@ -51,7 +51,10 @@ const i18nProvider = polyglotI18nProvider(() => ({
     },
     courses: {
       ...customTranslations.resources.courses,
-      name: 'Curso |||| Cursos',
+      name: 'Curso |||| Curso',
+    },
+    scenarios: {
+      name: 'Escenario |||| Escenario',
     },
   },
 }), 'es');
@@ -66,9 +69,9 @@ const App = () => (
     requireAuth
   >
     <Resource name="academic-terms" list={TermList} create={TermCreate} edit={TermEdit} options={{ label: 'Períodos' }} icon={CalendarMonthIcon} />
-    <Resource name="courses" list={CourseList} create={CourseCreate} edit={CourseEdit} options={{ label: 'Cursos' }} icon={SchoolIcon} />
+    <Resource name="courses" list={CourseList} create={CourseCreate} edit={CourseEdit} options={{ label: 'Curso' }} icon={SchoolIcon} />
     <Resource name="students" list={StudentList} create={StudentCreate} edit={StudentEdit} options={{ label: 'Estudiantes' }} icon={GroupIcon} />
-    <Resource name="scenarios" list={ScenarioList} show={ScenarioShow} create={ScenarioCreate} options={{ label: 'Escenarios (Juego)' }} icon={VideogameAssetIcon} />
+    <Resource name="scenarios" list={ScenarioList} show={ScenarioShow} create={ScenarioCreate} options={{ label: 'Escenario' }} icon={VideogameAssetIcon} />
     <Resource name="tasks" list={TaskList} create={TaskCreate} edit={TaskEdit} options={{ label: 'Tareas' }} icon={AssignmentIcon} />
     
     {/* VISTA PERSONALIZADA: MONITOR DE DESEMPEÑO */}
