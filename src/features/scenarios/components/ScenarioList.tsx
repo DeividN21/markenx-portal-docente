@@ -2,8 +2,7 @@ import {
   List, 
   Datagrid, 
   TextField,
-  ShowButton,
-  FunctionField
+  ShowButton
 } from 'react-admin';
 
 /**
@@ -30,11 +29,7 @@ export const ScenarioList = () => (
     >
       <TextField source="title" label="Título" sortable={false} />
       <TextField source="description" label="Descripción" sortable={false} />
-      <FunctionField
-        label="Acciones"
-        sortable={false}
-        render={() => <ShowButton label="Ver" />}
-      />
+      <ShowButton label="Ver" />
     </Datagrid>
   </List>
 );

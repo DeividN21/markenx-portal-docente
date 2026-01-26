@@ -1,27 +1,43 @@
 import { useState, useEffect } from 'react';
 import { useDataProvider, Title } from 'react-admin';
+import { useNavigate } from 'react-router-dom';
+import { apiService } from '../services/api.service';
 import { 
     Card, CardContent, Typography, Grid, Select, MenuItem, 
     FormControl, InputLabel, Box, List, ListItemButton, ListItemText, 
-    ListItemAvatar, Avatar, Chip, Divider, LinearProgress,
-    Table, TableBody, TableCell, TableHead, TableRow, Paper
+    ListItemAvatar, Avatar, Chip,
+    Table, TableBody, TableCell, TableHead, TableRow, Button
 } from '@mui/material';
 
 // Iconos
 import SchoolIcon from '@mui/icons-material/School';
 import PersonIcon from '@mui/icons-material/Person';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
 // ESTILOS AUXILIARES
 const cardStyle = { mb: 2, boxShadow: 3 };
 
+// TRADUCCIÓN DE ESTADOS
+const translateStatus = (status: string): string => {
+    const translations: Record<string, string> = {
+        'UNKNOWN': 'DESCONOCIDO',
+        'APPROVED': 'COMPLETADO',
+        'DISAPPROVED': 'FALLIDO'
+    };
+    return translations[status] || status;
+};
+
+// COLORES PARA ESTADOS
+const getStatusColor = (status: string): 'success' | 'error' | 'default' => {
+    if (status === 'APPROVED') return 'success';
+    if (status === 'DISAPPROVED') return 'error';
+    return 'default';
+};
+
 export const PerformancePage = () => {
     const dataProvider = useDataProvider();
+    const navigate = useNavigate();
     
     // ESTADOS DE SELECCIÓN
     const [terms, setTerms] = useState<any[]>([]);
@@ -34,7 +50,6 @@ export const PerformancePage = () => {
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
 
     const [studentTasks, setStudentTasks] = useState<any[]>([]);
-    const [selectedResult, setSelectedResult] = useState<any>(null); // El JSON de Unity
 
     // CARGA INICIAL: PERIODOS
     useEffect(() => {
@@ -50,58 +65,46 @@ export const PerformancePage = () => {
         setSelectedTerm(termId);
         setSelectedCourse(null);
         setSelectedStudent(null);
-        setSelectedResult(null);
         
+        // Obtener todos los cursos y filtrar localmente por termId
         dataProvider.getList('courses', {
-            pagination: { page: 1, perPage: 100 },
+            pagination: { page: 1, perPage: 1000 },
             sort: { field: 'name', order: 'ASC' },
-            filter: { academic_term_id: termId }
-        }).then(({ data }) => setCourses(data));
+            filter: {}
+        }).then(({ data }) => {
+            const filteredCourses = data.filter((course: any) => course.termId === termId);
+            setCourses(filteredCourses);
+        });
     };
 
     // AL SELECCIONAR CURSO -> CARGAR ESTUDIANTES
     const handleCourseClick = (course: any) => {
         setSelectedCourse(course);
         setSelectedStudent(null);
-        setSelectedResult(null);
 
+        // Obtener todos los estudiantes y filtrar localmente por courseId
         dataProvider.getList('students', {
-            pagination: { page: 1, perPage: 100 },
+            pagination: { page: 1, perPage: 1000 },
             sort: { field: 'last_name', order: 'ASC' },
-            filter: { course_id: course.id }
-        }).then(({ data }) => setStudents(data));
+            filter: {}
+        }).then(({ data }) => {
+            const filteredStudents = data.filter((student: any) => student.courseId === course.id);
+            setStudents(filteredStudents);
+        });
     };
 
-    // AL SELECCIONAR ESTUDIANTE -> CARGAR TAREAS E INTENTOS
+    // AL SELECCIONAR ESTUDIANTE -> CARGAR INTENTOS
     const handleStudentClick = async (student: any) => {
         setSelectedStudent(student);
-        setSelectedResult(null);
 
-        // 1. Traer tareas del curso
-        const { data: tasks } = await dataProvider.getList('tasks', {
-            pagination: { page: 1, perPage: 100 },
-            sort: { field: 'deadline', order: 'DESC' },
-            filter: { course_id: selectedCourse.id }
-        });
-
-        // 2. Traer intentos del estudiante
-        const { data: attempts } = await dataProvider.getList('attempts', {
-            pagination: { page: 1, perPage: 100 },
-            sort: { field: 'sessionDate', order: 'DESC' },
-            filter: { student_id: student.id }
-        });
-
-        // 3. Fusionar info: Tarea + Su mejor intento
-        const tasksWithStatus = tasks.map((task: any) => {
-            const attempt = attempts.find((a: any) => a.task_id === task.id);
-            return {
-                ...task,
-                status: attempt ? 'COMPLETED' : 'PENDING',
-                attemptData: attempt
-            };
-        });
-
-        setStudentTasks(tasksWithStatus);
+        try {
+            // Traer intentos del estudiante usando el endpoint específico
+            const { json } = await apiService.get<any[]>(`/students/${student.id}/attempts`);
+            setStudentTasks(json || []);
+        } catch (error) {
+            console.error('Error loading attempts:', error);
+            setStudentTasks([]);
+        }
     };
 
     return (
@@ -125,7 +128,7 @@ export const PerformancePage = () => {
                                     onChange={(e) => handleTermChange(e.target.value)}
                                 >
                                     {terms.map(term => (
-                                        <MenuItem key={term.id} value={term.id}>{term.name}</MenuItem>
+                                        <MenuItem key={term.id} value={term.id}>{term.label}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
@@ -177,7 +180,7 @@ export const PerformancePage = () => {
                                             <ListItemAvatar>
                                                 <Avatar><PersonIcon /></Avatar>
                                             </ListItemAvatar>
-                                            <ListItemText primary={`${student.first_name} ${student.last_name}`} secondary={student.email} />
+                                            <ListItemText primary={student.fullName} secondary={student.email} />
                                         </ListItemButton>
                                     ))}
                                 </List>
@@ -189,125 +192,87 @@ export const PerformancePage = () => {
                 {/* @ts-ignore - MUI v7 Grid compatibility */}
                 <Grid item xs={12} md={8}>
                     {selectedStudent ? (
-                        <>
-                            {/* 4. LISTA DE ASIGNACIONES */}
-                            <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
-                                Asignaciones de {selectedStudent.first_name}
-                            </Typography>
-                            
-                            <Grid container spacing={2} sx={{ mb: 4 }}>
-                                {studentTasks.map(task => (
-                                    // @ts-ignore - MUI v7 Grid compatibility
-                                    <Grid item xs={12} sm={6} key={task.id}>
-                                        <Card 
-                                            onClick={() => task.status === 'COMPLETED' && setSelectedResult(task.attemptData)}
-                                            sx={{ 
-                                                cursor: task.status === 'COMPLETED' ? 'pointer' : 'default',
-                                                borderLeft: task.status === 'COMPLETED' ? '6px solid #22c55e' : '6px solid #94a3b8',
-                                                transition: 'transform 0.2s',
-                                                '&:hover': { transform: task.status === 'COMPLETED' ? 'translateY(-2px)' : 'none' }
-                                            }}
-                                        >
-                                            <CardContent>
-                                                <Box display="flex" justifyContent="space-between" alignItems="center">
-                                                    <Typography variant="subtitle1" fontWeight="bold">{task.title}</Typography>
-                                                    {task.status === 'COMPLETED' ? 
-                                                        <Chip icon={<CheckCircleIcon />} label="Completada" color="success" size="small" /> : 
-                                                        <Chip icon={<CancelIcon />} label="Pendiente" size="small" />
-                                                    }
-                                                </Box>
-                                                <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                                                    Vence: {new Date(task.deadline).toLocaleDateString()}
-                                                </Typography>
-                                                {task.status === 'COMPLETED' && (
-                                                    <Typography variant="caption" color="primary" sx={{ mt: 1, display: 'block' }}>
-                                                        Clic para ver métricas 📊
-                                                    </Typography>
-                                                )}
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>
-                                ))}
-                            </Grid>
-
-                            {/* 5. VISUALIZACIÓN DE MÉTRICAS (JSON DE UNITY) */}
-                            {selectedResult && (
-                                <Box component={Paper} p={3} sx={{ bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                                    <Typography variant="h5" color="primary.dark" gutterBottom>
-                                        Reporte de Partida: {selectedResult.finalOutcome}
-                                    </Typography>
-                                    <Divider sx={{ mb: 2 }} />
-                                    <Grid container spacing={3} mb={3}>
-                                        {/* @ts-ignore - MUI v7 Grid compatibility */}
-                                        <Grid item xs={4}>
-                                            <Card elevation={0} sx={{ bgcolor: 'white', border: '1px solid #ddd', textAlign: 'center', p: 1 }}>
-                                                <TrendingUpIcon color="primary" fontSize="large" />
-                                                <Typography variant="h4">{(selectedResult.finalAcceptance * 100).toFixed(0)}%</Typography>
-                                                <Typography variant="caption">Aceptación Final</Typography>
-                                            </Card>
-                                        </Grid>
-                                        {/* @ts-ignore - MUI v7 Grid compatibility */}
-                                        <Grid item xs={4}>
-                                            <Card elevation={0} sx={{ bgcolor: 'white', border: '1px solid #ddd', textAlign: 'center', p: 1 }}>
-                                                <AttachMoneyIcon color="success" fontSize="large" />
-                                                <Typography variant="h4">${selectedResult.remainingBudget}</Typography>
-                                                <Typography variant="caption">Presupuesto Restante</Typography>
-                                            </Card>
-                                        </Grid>
-                                        {/* @ts-ignore - MUI v7 Grid compatibility */}
-                                        <Grid item xs={4}>
-                                            <Card elevation={0} sx={{ bgcolor: 'white', border: '1px solid #ddd', textAlign: 'center', p: 1 }}>
-                                                <VisibilityIcon color="secondary" fontSize="large" />
-                                                <Typography variant="h4">{(selectedResult.profileDiscoveryPercentage * 100).toFixed(0)}%</Typography>
-                                                <Typography variant="caption">Perfil Descubierto</Typography>
-                                            </Card>
-                                        </Grid>
-                                    </Grid>
-
-                                    {/* Tabla de Historial Turno a Turno */}
-                                    <Typography variant="h6" gutterBottom>Historial de Decisiones (Turn-by-Turn)</Typography>
-                                    <Table size="small" sx={{ bgcolor: 'white' }}>
+                        <Card sx={{ ...cardStyle, height: 'fit-content' }}>
+                            <CardContent>
+                                {studentTasks.length > 0 ? (
+                                    <Box sx={{ maxHeight: 600, overflow: 'auto' }}>
+                                        <Table>
                                         <TableHead>
-                                            <TableRow sx={{ bgcolor: '#eff6ff' }}>
-                                                <TableCell>Turno</TableCell>
-                                                <TableCell>Aceptación</TableCell>
-                                                <TableCell>Presupuesto</TableCell>
-                                                <TableCell>Acciones Compradas</TableCell>
-                                                <TableCell>Eventos</TableCell>
+                                            <TableRow sx={{ bgcolor: '#f8fafc' }}>
+                                                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Fecha y hora de inicio</TableCell>
+                                                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Fecha y hora de fin</TableCell>
+                                                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Estado</TableCell>
+                                                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Puntuación</TableCell>
+                                                <TableCell align="center" sx={{ fontWeight: 'bold' }}>Acción</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {selectedResult.history.map((turn: any) => (
-                                                <TableRow key={turn.turnNumber}>
-                                                    <TableCell sx={{ fontWeight: 'bold' }}>{turn.turnNumber}</TableCell>
-                                                    <TableCell>
-                                                        <Box display="flex" alignItems="center">
-                                                            <LinearProgress variant="determinate" value={turn.acceptanceAtEnd * 100} sx={{ width: 50, mr: 1, height: 8, borderRadius: 5 }} />
-                                                            {(turn.acceptanceAtEnd * 100).toFixed(0)}%
-                                                        </Box>
+                                            {studentTasks.map((attempt: any) => (
+                                                <TableRow key={attempt.attemptId}>
+                                                    <TableCell align="center">
+                                                        {new Date(attempt.startedAt).toLocaleString('es-ES', {
+                                                            year: 'numeric',
+                                                            month: '2-digit',
+                                                            day: '2-digit',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
                                                     </TableCell>
-                                                    <TableCell>${turn.budgetAtEnd}</TableCell>
-                                                    <TableCell>
-                                                        {turn.actionsTakenIds.length > 0 ? (
-                                                            turn.actionsTakenIds.map((act: string) => (
-                                                                <Chip key={act} label={act} size="small" sx={{ mr: 0.5, mb: 0.5, fontSize: '0.7rem' }} />
-                                                            ))
-                                                        ) : <Typography variant="caption" color="textSecondary">Ninguna</Typography>}
+                                                    <TableCell align="center">
+                                                        {attempt.finishedAt ? new Date(attempt.finishedAt).toLocaleString('es-ES', {
+                                                            year: 'numeric',
+                                                            month: '2-digit',
+                                                            day: '2-digit',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        }) : '-'}
                                                     </TableCell>
-                                                    <TableCell>
-                                                        {turn.eventOcurredTitle ? (
-                                                            <Typography variant="caption" color="error" fontWeight="bold">
-                                                                ⚠️ {turn.eventOcurredTitle}
-                                                            </Typography>
-                                                        ) : "-"}
+                                                    <TableCell align="center">
+                                                        <Chip 
+                                                            label={translateStatus(attempt.status)} 
+                                                            color={getStatusColor(attempt.status)}
+                                                            size="small"
+                                                            sx={{
+                                                                width: '120px',
+                                                                '& .MuiChip-label': {
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    whiteSpace: 'nowrap',
+                                                                }
+                                                            }}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell align="center">
+                                                        {attempt.score !== null && attempt.score !== undefined 
+                                                            ? (attempt.score * 100).toFixed(0) + '%'
+                                                            : '-'}
+                                                    </TableCell>
+                                                    <TableCell align="center">
+                                                        <Button 
+                                                            size="small" 
+                                                            variant="text"
+                                                            color="primary"
+                                                            startIcon={<VisibilityIcon />}
+                                                            onClick={() => navigate(`/attempts/${attempt.attemptId}`)}
+                                                        >
+                                                            Ver
+                                                        </Button>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
                                     </Table>
-                                </Box>
-                            )}
-                        </>
+                                    </Box>
+                                ) : (
+                                    <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" py={4}>
+                                        <AssignmentIcon sx={{ fontSize: 60, color: '#cbd5e1' }} />
+                                        <Typography variant="body1" color="textSecondary" mt={2}>
+                                            Este estudiante no tiene intentos registrados
+                                        </Typography>
+                                    </Box>
+                                )}
+                            </CardContent>
+                        </Card>
                     ) : (
                         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100%" sx={{ opacity: 0.5 }}>
                             <AssignmentIcon sx={{ fontSize: 100, color: '#cbd5e1' }} />

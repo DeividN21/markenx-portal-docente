@@ -1,4 +1,5 @@
-import { Admin, Resource } from "react-admin";
+import { Admin, Resource, CustomRoutes } from "react-admin";
+import { Route } from 'react-router-dom';
 import polyglotI18nProvider from "ra-i18n-polyglot";
 import spanishMessages from "ra-language-spanish";
 
@@ -26,6 +27,7 @@ import { StudentList, StudentCreate, StudentEdit } from "./features/students";
 import { ScenarioList, ScenarioShow, ScenarioCreate } from "./features/scenarios";
 import { TaskList, TaskCreate, TaskEdit } from "./features/tasks";
 import { PerformancePage } from "./pages/PerformancePage";
+import { AttemptDashboardPage } from "./pages/AttemptDashboardPage";
 import { TermList, TermCreate, TermEdit } from "./features/terms";
 
 // Combinar traducciones base con personalizadas
@@ -83,6 +85,11 @@ const App = () => (
     />
 
     <Resource name="attempts" />
+
+    {/* RUTAS PERSONALIZADAS */}
+    <CustomRoutes>
+      <Route path="/attempts/:id" element={<AttemptDashboardPage />} />
+    </CustomRoutes>
 
   </Admin>
 );
