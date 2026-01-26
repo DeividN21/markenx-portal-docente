@@ -9,7 +9,10 @@ import { dataProvider } from "./providers/dataProvider";
 import { authProvider } from "./auth/authProvider";
 import { markenxTheme } from './theme';
 
-// 3. IMPORTS DE ICONOS
+// 3. IMPORTS DE TRADUCCIONES
+import { customTranslations } from "./i18n/customTranslations";
+
+// 4. IMPORTS DE ICONOS
 import SchoolIcon from '@mui/icons-material/School';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import GroupIcon from '@mui/icons-material/Group';
@@ -17,7 +20,7 @@ import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import BarChartIcon from '@mui/icons-material/BarChart';
 
-// 4. IMPORTS DE RECURSOS (VISTAS)
+// 5. IMPORTS DE RECURSOS (VISTAS)
 import { CourseList, CourseCreate, CourseEdit } from "./features/courses";
 import { StudentList, StudentCreate, StudentEdit } from "./features/students";
 import { ScenarioList, ScenarioCreate, ScenarioEdit } from "./features/scenarios";
@@ -25,33 +28,29 @@ import { TaskList, TaskCreate, TaskEdit } from "./features/tasks";
 import { PerformancePage } from "./pages/PerformancePage";
 import { TermList, TermCreate, TermEdit } from "./features/terms";
 
-// CONFIGURACIÓN
-
-// Personalizar mensajes en español
-const customSpanishMessages = {
+// Combinar traducciones base con personalizadas
+const i18nProvider = polyglotI18nProvider(() => ({
   ...spanishMessages,
   ra: {
     ...spanishMessages.ra,
     action: {
       ...spanishMessages.ra.action,
-      export: 'Exportar CSV',
+      ...customTranslations.ra.action,
     },
     navigation: {
       ...spanishMessages.ra.navigation,
-      page_rows_per_page: 'N# de registros',
+      ...customTranslations.ra.navigation,
     },
   },
-};
-
-const i18nProvider = polyglotI18nProvider(() => customSpanishMessages, "es");
+}), 'es');
 
 const App = () => (
   <Admin
     theme={markenxTheme}
     dataProvider={dataProvider}
     authProvider={authProvider}
-    loginPage={false}
     i18nProvider={i18nProvider}
+    loginPage={false}
     requireAuth
   >
     <Resource name="academic-terms" list={TermList} create={TermCreate} edit={TermEdit} options={{ label: 'Períodos' }} icon={CalendarMonthIcon} />

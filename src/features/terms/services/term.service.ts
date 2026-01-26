@@ -1,5 +1,5 @@
 import { apiService } from '../../../services/api.service';
-import type { Term, TermStatusCode } from '../types/term.types';
+import type { Term, TermStatusCode, LifecycleStatus } from '../types/term.types';
 
 /**
  * Servicio para operaciones específicas de Terms
@@ -17,6 +17,21 @@ export const changeTermStatus = async (
   const response = await apiService.patch<Term>(
     `/academic-terms/${termId}/status`,
     { status: newStatusCode }
+  );
+  return response.json;
+};
+
+/**
+ * Cambiar el estado del ciclo de vida de un período académico
+ * PATCH /api/academic-terms/{id}/lifecycle-status
+ */
+export const changeTermLifecycleStatus = async (
+  termId: string,
+  newLifecycleStatus: LifecycleStatus
+): Promise<Term> => {
+  const response = await apiService.patch<Term>(
+    `/academic-terms/${termId}/lifecycle-status`,
+    { lifecycleStatus: newLifecycleStatus }
   );
   return response.json;
 };

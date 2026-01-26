@@ -15,6 +15,13 @@ export interface TermStatus {
 }
 
 /**
+ * Estado del ciclo de vida de una entidad
+ * - ACTIVE: Habilitado
+ * - DISABLED: Deshabilitado
+ */
+export type LifecycleStatus = 'ACTIVE' | 'DISABLED';
+
+/**
  * Interfaz para un período académico (Academic Term)
  * Refleja la estructura exacta de la API
  */
@@ -23,7 +30,8 @@ export interface Term {
   label: string;        // Nombre del período (ej: "2026-2")
   startDate: string;    // YYYY-MM-DD
   endDate: string;      // YYYY-MM-DD
-  status: TermStatus;   // Objeto con code y label
+  status: TermStatus;   // Objeto con code y label (UPCOMING, ACTIVE, ENDED)
+  lifecycleStatus: LifecycleStatus;  // Estado de activación (ACTIVE, DISABLED)
 }
 
 /**

@@ -1,6 +1,5 @@
 import { Edit, SimpleForm, TextInput, Toolbar, SaveButton, useRecordContext, useNotify } from 'react-admin';
 import { TermForm } from './TermForm';
-import { TermChangeStatusButton } from './TermChangeStatusButton';
 import type { Term } from '../types/term.types';
 import { canEdit } from '../utils/term.utils';
 import { transformTermForUpdate } from '../utils/term.transform';
@@ -8,7 +7,6 @@ import { transformTermForUpdate } from '../utils/term.transform';
 /**
  * Toolbar personalizado para edición de términos
  * - Solo muestra el botón de guardar si el término está en UPCOMING
- * - Siempre muestra el botón de cambio de estado
  */
 const TermEditToolbar = () => {
   const record = useRecordContext<Term>();
@@ -17,7 +15,6 @@ const TermEditToolbar = () => {
   return (
     <Toolbar>
       {canEditRecord && <SaveButton />}
-      <TermChangeStatusButton />
     </Toolbar>
   );
 };

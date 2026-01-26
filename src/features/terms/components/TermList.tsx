@@ -3,6 +3,7 @@ import { Chip } from '@mui/material';
 import type { Term } from '../types/term.types';
 import { TERM_STATUS_COLORS } from '../types/term.types';
 import { canEdit } from '../utils/term.utils';
+import { TermLifecycleToggle } from './TermLifecycleToggle';
 
 /**
  * Componente de lista de períodos académicos
@@ -13,7 +14,18 @@ export const TermList = () => (
     sort={{ field: 'startDate', order: 'DESC' }}
     perPage={25}
   >
-    <Datagrid rowClick={false} bulkActionButtons={false}>
+    <Datagrid 
+      rowClick={false} 
+      bulkActionButtons={false}
+      sx={{
+        '& .RaDatagrid-headerCell': {
+          textAlign: 'center',
+        },
+        '& .RaDatagrid-rowCell': {
+          textAlign: 'center',
+        }
+      }}
+    >
       <TextField source="label" label="Período" sortable={false} />
       <DateField
         source="startDate"
@@ -34,9 +46,17 @@ export const TermList = () => (
         sortable={false}
         render={(record: Term) => (
           <Chip
-            label={record.status.label}
+            label={record.status.label.toUpperCase()}
             color={TERM_STATUS_COLORS[record.status.code]}
             size="small"
+            sx={{
+              width: '120px',
+              '& .MuiChip-label': {
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }
+            }}
           />
         )}
       />
@@ -45,6 +65,13 @@ export const TermList = () => (
         sortable={false}
         render={(record: Term) => (
           canEdit(record) ? <EditButton /> : null
+        )}
+      />
+      <FunctionField
+        label=""
+        sortable={false}
+        render={(record: Term) => (
+          <TermLifecycleToggle record={record} />
         )}
       />
     </Datagrid>
