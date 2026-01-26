@@ -34,49 +34,174 @@ export const scenarioTemplate = {
       productInitialOffer: 0.40
     }
   ],
-  actions: [
+  productionActions: [
     {
-      id: "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
       name: "Empaque Reciclado",
       description: "Cambiar a cartón 100% reciclado para el empaque del producto",
       cost: 150,
-      category: "PRODUCTION",
       isInitiallyLocked: false,
       prerequisiteActionId: null,
       effects: [
         {
-          dimensionId: "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+          dimensionId: "interes_ecologico",
           delta: 0.15
         }
       ]
     },
     {
-      id: "g2h3i4j5-k6l7-8901-mnop-123456789012",
-      name: "Material Biodegradable",
-      description: "Utilizar material biodegradable que se degrada en 30 días",
-      cost: 200,
-      category: "PRODUCTION",
-      isInitiallyLocked: true,
-      prerequisiteActionId: "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
+      name: "Mejora de Calidad",
+      description: "Implementar controles de calidad más estrictos y materiales premium",
+      cost: 300,
+      isInitiallyLocked: false,
+      prerequisiteActionId: null,
       effects: [
         {
-          dimensionId: "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+          dimensionId: "exigencia_de_calidad",
           delta: 0.25
         }
       ]
     },
     {
-      id: "a3b4c5d6-e7f8-9012-abcd-234567890123",
-      name: "Campaña Verde",
-      description: "Lanzar campaña publicitaria destacando el compromiso ecológico",
-      cost: 300,
-      category: "PROMOTION",
+      name: "Material Biodegradable",
+      description: "Utilizar material biodegradable que se degrada en 30 días",
+      cost: 200,
+      isInitiallyLocked: true,
+      prerequisiteActionId: "Empaque Reciclado",
+      effects: [
+        {
+          dimensionId: "interes_ecologico",
+          delta: 0.25
+        }
+      ]
+    }
+  ],
+  priceActions: [
+    {
+      name: "Descuento Inicial",
+      description: "Ofrecer un descuento del 15% en el precio de lanzamiento",
+      cost: 100,
       isInitiallyLocked: false,
       prerequisiteActionId: null,
       effects: [
         {
-          dimensionId: "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+          dimensionId: "sensibilidad_al_precio",
           delta: 0.20
+        }
+      ]
+    },
+    {
+      name: "Precio Competitivo",
+      description: "Ajustar precio para estar por debajo de la competencia",
+      cost: 150,
+      isInitiallyLocked: false,
+      prerequisiteActionId: null,
+      effects: [
+        {
+          dimensionId: "sensibilidad_al_precio",
+          delta: 0.30
+        }
+      ]
+    },
+    {
+      name: "Plan de Financiamiento",
+      description: "Ofrecer pagos en cuotas sin intereses",
+      cost: 80,
+      isInitiallyLocked: false,
+      prerequisiteActionId: null,
+      effects: [
+        {
+          dimensionId: "sensibilidad_al_precio",
+          delta: 0.15
+        }
+      ]
+    }
+  ],
+  placeActions: [
+    {
+      name: "Venta en Línea",
+      description: "Abrir canal de venta directa en línea con entrega a domicilio",
+      cost: 250,
+      isInitiallyLocked: false,
+      prerequisiteActionId: null,
+      effects: [
+        {
+          dimensionId: "sensibilidad_al_precio",
+          delta: 0.10
+        }
+      ]
+    },
+    {
+      name: "Tiendas Especializadas",
+      description: "Distribuir en tiendas ecológicas y de productos premium",
+      cost: 200,
+      isInitiallyLocked: false,
+      prerequisiteActionId: null,
+      effects: [
+        {
+          dimensionId: "interes_ecologico",
+          delta: 0.10
+        },
+        {
+          dimensionId: "exigencia_de_calidad",
+          delta: 0.10
+        }
+      ]
+    },
+    {
+      name: "Red de Distribuidores",
+      description: "Expandir a múltiples distribuidores regionales",
+      cost: 400,
+      isInitiallyLocked: false,
+      prerequisiteActionId: null,
+      effects: [
+        {
+          dimensionId: "sensibilidad_al_precio",
+          delta: -0.05
+        }
+      ]
+    }
+  ],
+  promotionActions: [
+    {
+      name: "Campaña Verde",
+      description: "Lanzar campaña publicitaria destacando el compromiso ecológico",
+      cost: 300,
+      isInitiallyLocked: false,
+      prerequisiteActionId: null,
+      effects: [
+        {
+          dimensionId: "interes_ecologico",
+          delta: 0.20
+        }
+      ]
+    },
+    {
+      name: "Redes Sociales",
+      description: "Campaña en redes sociales con influencers ecológicos",
+      cost: 200,
+      isInitiallyLocked: false,
+      prerequisiteActionId: null,
+      effects: [
+        {
+          dimensionId: "interes_ecologico",
+          delta: 0.15
+        }
+      ]
+    },
+    {
+      name: "Certificación Ecológica",
+      description: "Obtener y publicitar certificación ambiental internacional",
+      cost: 350,
+      isInitiallyLocked: true,
+      prerequisiteActionId: "Campaña Verde",
+      effects: [
+        {
+          dimensionId: "interes_ecologico",
+          delta: 0.30
+        },
+        {
+          dimensionId: "exigencia_de_calidad",
+          delta: 0.15
         }
       ]
     }
@@ -88,7 +213,7 @@ export const scenarioTemplate = {
       description: "Impulso global por la sostenibilidad gana fuerza en los medios",
       effects: [
         {
-          dimensionId: "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+          dimensionId: "interes_ecologico",
           weightMultiplier: 1.5
         }
       ]
@@ -99,7 +224,7 @@ export const scenarioTemplate = {
       description: "Recesión económica aumenta la sensibilidad al precio del consumidor",
       effects: [
         {
-          dimensionId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+          dimensionId: "sensibilidad_al_precio",
           weightMultiplier: 1.8
         }
       ]

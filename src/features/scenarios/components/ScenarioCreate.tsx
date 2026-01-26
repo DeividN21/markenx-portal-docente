@@ -36,10 +36,30 @@ const ScenarioCreateToolbar = (props: any) => {
 export const ScenarioCreate = () => {
   const notify = useNotify();
 
+  // Transform data before submit
+  const transform = (data: any) => {
+    // Combine all actions from different categories into single array
+    const actions = [
+      ...(data.productionActions || []).map((action: any) => ({ ...action, category: 'PRODUCTION' })),
+      ...(data.priceActions || []).map((action: any) => ({ ...action, category: 'PRICE' })),
+      ...(data.placeActions || []).map((action: any) => ({ ...action, category: 'PLACE' })),
+      ...(data.promotionActions || []).map((action: any) => ({ ...action, category: 'PROMOTION' }))
+    ];
+
+    // Remove temporary action arrays
+    const { productionActions, priceActions, placeActions, promotionActions, ...rest } = data;
+
+    return {
+      ...rest,
+      actions
+    };
+  };
+
   return (
     <Create 
       title="Diseñar Nuevo Escenario" 
       redirect="list"
+      transform={transform}
       mutationOptions={{
         onError: (error) => {
           const apiError = error as { body?: { userMessage?: string } };

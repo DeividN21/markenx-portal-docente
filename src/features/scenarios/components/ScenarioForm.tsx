@@ -11,9 +11,12 @@ import {
   minValue,
   maxValue,
   minLength,
-  maxLength
+  maxLength,
+  FormDataConsumer
 } from 'react-admin';
-import { Typography, Alert } from '@mui/material';
+import { Typography, Alert, Tabs, Tab, Box, Tooltip, IconButton } from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { useState } from 'react';
 
 const validateRequired = [required()];
 const validatePercentage = [required(), minValue(0), maxValue(1)];
@@ -25,6 +28,34 @@ const validateAge = [required(), minValue(10), maxValue(100)];
 const validateBudget = [required(), minValue(0), maxValue(10000)];
 const validateDelta = [required(), minValue(-1), maxValue(1)];
 const validateWeightMultiplier = [required(), minValue(0)];
+
+// Categorías 4P
+const ACTION_CATEGORIES = {
+  PRODUCTION: {
+    key: 'PRODUCTION',
+    label: 'Producto',
+    description: 'Cambios en el producto físico o sus características tangibles',
+    examples: 'Mejorar calidad, cambiar materiales, añadir funcionalidades'
+  },
+  PRICE: {
+    key: 'PRICE',
+    label: 'Precio',
+    description: 'Estrategias de pricing y políticas de precios',
+    examples: 'Descuentos, promociones, ajustes de precio, financiamiento'
+  },
+  PLACE: {
+    key: 'PLACE',
+    label: 'Plaza (Distribución)',
+    description: 'Canales de distribución y puntos de venta',
+    examples: 'Expandir canales, venta online, distribuidores, logística'
+  },
+  PROMOTION: {
+    key: 'PROMOTION',
+    label: 'Promoción (Comunicación)',
+    description: 'Comunicación y publicidad del producto',
+    examples: 'Campañas publicitarias, redes sociales, eventos, relaciones públicas'
+  }
+};
 
 /**
  * Convert text to snake_case
@@ -206,95 +237,458 @@ export const ScenarioForm = ({ toolbar }: { toolbar?: React.ReactElement }) => {
       </FormTab>
 
       {/* TAB 4: ACTIONS */}
-      <FormTab label="4. Acciones">
+      <FormTab label="4. Acciones (4P)">
         <Alert severity="info" sx={{ mb: 2 }}>
           <Typography variant="body2">
             <strong>Acciones de Marketing (4P)</strong><br/>
             Decisiones que el jugador puede tomar para modificar el producto. Cada acción tiene un costo y genera efectos (deltas) en las dimensiones.<br/>
-            • <strong>delta</strong>: Cambio aplicado a la dimensión (puede ser positivo o negativo)<br/>
-            • <strong>prerequisiteActionId</strong>: Acción que debe ejecutarse antes (opcional)<br/>
-            • Categorías: PRICE (Precio), PROMOTION (Promoción), PRODUCTION (Producto), PLACE (Plaza)
+            • Debe haber <strong>al menos 1 acción por categoría</strong><br/>
+            • Cada acción debe tener <strong>al menos 1 efecto</strong> sobre alguna dimensión<br/>
+            • Las acciones pueden depender de otras (prerequisitos)
           </Typography>
         </Alert>
-        
-        <ArrayInput source="actions" label="Acciones Disponibles" validate={validateNotEmpty}>
-          <SimpleFormIterator>
-            <TextInput 
-              source="id" 
-              label="ID" 
-              fullWidth
-              validate={validateRequired}
-              helperText="UUID único para esta acción"
-            />
-            <TextInput 
-              source="name" 
-              label="Nombre de la Acción" 
-              fullWidth
-              validate={validateRequired}
-              helperText="Nombre visible: 'Aplicar Descuento', 'Campaña en Redes Sociales'"
-            />
-            <TextInput 
-              source="description" 
-              label="Descripción" 
-              fullWidth
-              multiline 
-              rows={2}
-              validate={validateRequired}
-              helperText="Explique qué hace esta acción y su efecto esperado"
-            />
-            <NumberInput 
-              source="cost" 
-              label="Costo" 
-              validate={validatePositive}
-              step={50}
-              min={0}
-              helperText="Cuánto presupuesto consume esta acción"
-            />
-            <SelectInput 
-              source="category" 
-              label="Categoría (4P)" 
-              choices={[
-                { id: 'PRICE', name: 'Precio - Estrategias de precios' },
-                { id: 'PROMOTION', name: 'Promoción - Comunicación y publicidad' },
-                { id: 'PRODUCTION', name: 'Producto - Cambios en el producto físico' },
-                { id: 'PLACE', name: 'Plaza - Canales de distribución' },
-              ]} 
-              validate={validateRequired}
-            />
-            <BooleanInput 
-              source="isInitiallyLocked" 
-              label="¿Bloqueada Inicialmente?" 
-              defaultValue={false}
-              helperText="Si está bloqueada, requiere un prerequisito para desbloquearse"
-            />
-            <TextInput 
-              source="prerequisiteActionId" 
-              label="ID de Acción Prerequisito" 
-              fullWidth
-              helperText="(Opcional) UUID de la acción que debe ejecutarse primero"
-            />
+
+        <FormDataConsumer>
+          {({ formData }) => {
+            const [activeTab, setActiveTab] = useState(0);
             
-            <ArrayInput source="effects" label="Efectos sobre Dimensiones" validate={validateNotEmpty}>
-              <SimpleFormIterator inline>
-                <TextInput 
-                  source="dimensionId" 
-                  label="ID de Dimensión" 
-                  validate={validateRequired}
-                  helperText="UUID de la dimensión que se verá afectada"
-                />
-                <NumberInput 
-                  source="delta" 
-                  label="Delta (cambio)" 
-                  step={0.05}
-                  min={-1}
-                  max={1}
-                  validate={validateDelta}
-                  helperText="Cambio en la dimensión (-1.0 a 1.0). Puede ser positivo o negativo"
-                />
-              </SimpleFormIterator>
-            </ArrayInput>
-          </SimpleFormIterator>
-        </ArrayInput>
+            // Obtener dimensiones y acciones actuales
+            const dimensions = formData.dimensions || [];
+            const allActions = [
+              ...(formData.productionActions || []),
+              ...(formData.priceActions || []),
+              ...(formData.placeActions || []),
+              ...(formData.promotionActions || [])
+            ];
+
+            // Opciones de dimensiones para los selects
+            const dimensionChoices = dimensions.map((dim: any, idx: number) => ({
+              id: dim.name || `dimension_${idx}`,
+              name: dim.displayName || dim.name || `Dimensión ${idx + 1}`
+            }));
+
+            // Opciones de acciones prerequisito
+            const actionChoices = allActions.map((action: any, idx: number) => ({
+              id: action.name || `action_${idx}`,
+              name: action.name || `Acción ${idx + 1}`
+            }));
+
+            return (
+              <Box>
+                <Tabs 
+                  value={activeTab} 
+                  onChange={(_, newValue) => setActiveTab(newValue)}
+                  sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}
+                >
+                  <Tab label="Producto" />
+                  <Tab label="Precio" />
+                  <Tab label="Plaza" />
+                  <Tab label="Promoción" />
+                </Tabs>
+
+                {/* PRODUCTION ACTIONS */}
+                <Box hidden={activeTab !== 0}>
+                  <Alert severity="success" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                      <strong>{ACTION_CATEGORIES.PRODUCTION.label}</strong><br/>
+                      {ACTION_CATEGORIES.PRODUCTION.description}<br/>
+                      <em>Ejemplos: {ACTION_CATEGORIES.PRODUCTION.examples}</em>
+                    </Typography>
+                  </Alert>
+                  
+                  <ArrayInput source="productionActions" label={false} validate={validateNotEmpty}>
+                    <SimpleFormIterator
+                      inline={false}
+                      disableReordering={false}
+                      sx={{
+                        '& .RaSimpleFormIterator-line': {
+                          border: '1px solid #e0e0e0',
+                          borderRadius: 1,
+                          padding: 2,
+                          marginBottom: 2,
+                          backgroundColor: '#fafafa'
+                        }
+                      }}
+                    >
+                      <TextInput 
+                        source="name" 
+                        label="Nombre de la Acción" 
+                        fullWidth
+                        validate={validateRequired}
+                        helperText="Nombre descriptivo de la acción"
+                      />
+                      <TextInput 
+                        source="description" 
+                        label="Descripción" 
+                        fullWidth
+                        multiline 
+                        rows={2}
+                        validate={validateRequired}
+                        helperText="Explique qué hace esta acción y su efecto esperado"
+                      />
+                      <NumberInput 
+                        source="cost" 
+                        label="Costo" 
+                        fullWidth
+                        validate={validatePositive}
+                        step={50}
+                        min={0}
+                        helperText="Cuánto presupuesto consume esta acción"
+                      />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <BooleanInput 
+                          source="isInitiallyLocked" 
+                          label="¿Bloqueada inicialmente?" 
+                          defaultValue={false}
+                          helperText={false}
+                        />
+                        <Tooltip title="Si está bloqueada, requiere un prerequisito para desbloquearse">
+                          <IconButton size="small">
+                            <InfoOutlinedIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                      <FormDataConsumer>
+                        {({ scopedFormData }) => {
+                          const isLocked = scopedFormData?.isInitiallyLocked;
+                          return isLocked ? (
+                            <SelectInput 
+                              source="prerequisiteActionId" 
+                              label="Acción Prerequisito" 
+                              fullWidth
+                              choices={actionChoices}
+                              validate={validateRequired}
+                            />
+                          ) : null;
+                        }}
+                      </FormDataConsumer>
+                      
+                      <ArrayInput source="effects" label="Efectos sobre Dimensiones" validate={validateNotEmpty} sx={{ mt: 2 }}>
+                        <SimpleFormIterator inline>
+                          <SelectInput 
+                            source="dimensionId" 
+                            label="Dimensión Afectada" 
+                            choices={dimensionChoices}
+                            validate={validateRequired}
+                          />
+                          <NumberInput 
+                            source="delta" 
+                            label="Delta (cambio)" 
+                            step={0.05}
+                            min={-1}
+                            max={1}
+                            validate={validateDelta}
+                            helperText="Cambio: -1.0 a 1.0"
+                          />
+                        </SimpleFormIterator>
+                      </ArrayInput>
+                    </SimpleFormIterator>
+                  </ArrayInput>
+                </Box>
+
+                {/* PRICE ACTIONS */}
+                <Box hidden={activeTab !== 1}>
+                  <Alert severity="success" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                      <strong>{ACTION_CATEGORIES.PRICE.label}</strong><br/>
+                      {ACTION_CATEGORIES.PRICE.description}<br/>
+                      <em>Ejemplos: {ACTION_CATEGORIES.PRICE.examples}</em>
+                    </Typography>
+                  </Alert>
+                  
+                  <ArrayInput source="priceActions" label={false} validate={validateNotEmpty}>
+                    <SimpleFormIterator
+                      inline={false}
+                      disableReordering={false}
+                      sx={{
+                        '& .RaSimpleFormIterator-line': {
+                          border: '1px solid #e0e0e0',
+                          borderRadius: 1,
+                          padding: 2,
+                          marginBottom: 2,
+                          backgroundColor: '#fafafa'
+                        }
+                      }}
+                    >
+                      <TextInput 
+                        source="name" 
+                        label="Nombre de la Acción" 
+                        fullWidth
+                        validate={validateRequired}
+                        helperText="Nombre descriptivo de la acción"
+                      />
+                      <TextInput 
+                        source="description" 
+                        label="Descripción" 
+                        fullWidth
+                        multiline 
+                        rows={2}
+                        validate={validateRequired}
+                        helperText="Explique qué hace esta acción y su efecto esperado"
+                      />
+                      <NumberInput 
+                        source="cost" 
+                        label="Costo" 
+                        fullWidth
+                        validate={validatePositive}
+                        step={50}
+                        min={0}
+                        helperText="Cuánto presupuesto consume esta acción"
+                      />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <BooleanInput 
+                          source="isInitiallyLocked" 
+                          label="¿Bloqueada inicialmente?" 
+                          defaultValue={false}
+                          helperText={false}
+                        />
+                        <Tooltip title="Si está bloqueada, requiere un prerequisito para desbloquearse">
+                          <IconButton size="small">
+                            <InfoOutlinedIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                      <FormDataConsumer>
+                        {({ scopedFormData }) => {
+                          const isLocked = scopedFormData?.isInitiallyLocked;
+                          return isLocked ? (
+                            <SelectInput 
+                              source="prerequisiteActionId" 
+                              label="Acción Prerequisito" 
+                              fullWidth
+                              choices={actionChoices}
+                              validate={validateRequired}
+                            />
+                          ) : null;
+                        }}
+                      </FormDataConsumer>
+                      
+                      <ArrayInput source="effects" label="Efectos sobre Dimensiones" validate={validateNotEmpty} sx={{ mt: 2 }}>
+                        <SimpleFormIterator inline>
+                          <SelectInput 
+                            source="dimensionId" 
+                            label="Dimensión Afectada" 
+                            choices={dimensionChoices}
+                            validate={validateRequired}
+                          />
+                          <NumberInput 
+                            source="delta" 
+                            label="Delta (cambio)" 
+                            step={0.05}
+                            min={-1}
+                            max={1}
+                            validate={validateDelta}
+                            helperText="Cambio: -1.0 a 1.0"
+                          />
+                        </SimpleFormIterator>
+                      </ArrayInput>
+                    </SimpleFormIterator>
+                  </ArrayInput>
+                </Box>
+
+                {/* PLACE ACTIONS */}
+                <Box hidden={activeTab !== 2}>
+                  <Alert severity="success" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                      <strong>{ACTION_CATEGORIES.PLACE.label}</strong><br/>
+                      {ACTION_CATEGORIES.PLACE.description}<br/>
+                      <em>Ejemplos: {ACTION_CATEGORIES.PLACE.examples}</em>
+                    </Typography>
+                  </Alert>
+                  
+                  <ArrayInput source="placeActions" label={false} validate={validateNotEmpty}>
+                    <SimpleFormIterator
+                      inline={false}
+                      disableReordering={false}
+                      sx={{
+                        '& .RaSimpleFormIterator-line': {
+                          border: '1px solid #e0e0e0',
+                          borderRadius: 1,
+                          padding: 2,
+                          marginBottom: 2,
+                          backgroundColor: '#fafafa'
+                        }
+                      }}
+                    >
+                      <TextInput 
+                        source="name" 
+                        label="Nombre de la Acción" 
+                        fullWidth
+                        validate={validateRequired}
+                        helperText="Nombre descriptivo de la acción"
+                      />
+                      <TextInput 
+                        source="description" 
+                        label="Descripción" 
+                        fullWidth
+                        multiline 
+                        rows={2}
+                        validate={validateRequired}
+                        helperText="Explique qué hace esta acción y su efecto esperado"
+                      />
+                      <NumberInput 
+                        source="cost" 
+                        label="Costo" 
+                        fullWidth
+                        validate={validatePositive}
+                        step={50}
+                        min={0}
+                        helperText="Cuánto presupuesto consume esta acción"
+                      />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <BooleanInput 
+                          source="isInitiallyLocked" 
+                          label="¿Bloqueada inicialmente?" 
+                          defaultValue={false}
+                          helperText={false}
+                        />
+                        <Tooltip title="Si está bloqueada, requiere un prerequisito para desbloquearse">
+                          <IconButton size="small">
+                            <InfoOutlinedIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                      <FormDataConsumer>
+                        {({ scopedFormData }) => {
+                          const isLocked = scopedFormData?.isInitiallyLocked;
+                          return isLocked ? (
+                            <SelectInput 
+                              source="prerequisiteActionId" 
+                              label="Acción Prerequisito" 
+                              fullWidth
+                              choices={actionChoices}
+                              validate={validateRequired}
+                            />
+                          ) : null;
+                        }}
+                      </FormDataConsumer>
+                      
+                      <ArrayInput source="effects" label="Efectos sobre Dimensiones" validate={validateNotEmpty} sx={{ mt: 3 }}>
+                        <SimpleFormIterator inline>
+                          <SelectInput 
+                            source="dimensionId" 
+                            label="Dimensión Afectada" 
+                            choices={dimensionChoices}
+                            validate={validateRequired}
+                          />
+                          <NumberInput 
+                            source="delta" 
+                            label="Delta (cambio)" 
+                            step={0.05}
+                            min={-1}
+                            max={1}
+                            validate={validateDelta}
+                            helperText="Cambio: -1.0 a 1.0"
+                          />
+                        </SimpleFormIterator>
+                      </ArrayInput>
+                    </SimpleFormIterator>
+                  </ArrayInput>
+                </Box>
+
+                {/* PROMOTION ACTIONS */}
+                <Box hidden={activeTab !== 3}>
+                  <Alert severity="success" sx={{ mb: 2 }}>
+                    <Typography variant="body2">
+                      <strong>{ACTION_CATEGORIES.PROMOTION.label}</strong><br/>
+                      {ACTION_CATEGORIES.PROMOTION.description}<br/>
+                      <em>Ejemplos: {ACTION_CATEGORIES.PROMOTION.examples}</em>
+                    </Typography>
+                  </Alert>
+                  
+                  <ArrayInput source="promotionActions" label={false} validate={validateNotEmpty}>
+                    <SimpleFormIterator
+                      inline={false}
+                      disableReordering={false}
+                      sx={{
+                        '& .RaSimpleFormIterator-line': {
+                          border: '1px solid #e0e0e0',
+                          borderRadius: 1,
+                          padding: 2,
+                          marginBottom: 2,
+                          backgroundColor: '#fafafa'
+                        }
+                      }}
+                    >
+                      <TextInput 
+                        source="name" 
+                        label="Nombre de la Acción" 
+                        fullWidth
+                        validate={validateRequired}
+                        helperText="Nombre descriptivo de la acción"
+                      />
+                      <TextInput 
+                        source="description" 
+                        label="Descripción" 
+                        fullWidth
+                        multiline 
+                        rows={2}
+                        validate={validateRequired}
+                        helperText="Explique qué hace esta acción y su efecto esperado"
+                      />
+                      <NumberInput 
+                        source="cost" 
+                        label="Costo" 
+                        fullWidth
+                        validate={validatePositive}
+                        step={50}
+                        min={0}
+                        helperText="Cuánto presupuesto consume esta acción"
+                      />
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <BooleanInput 
+                          source="isInitiallyLocked" 
+                          label="¿Bloqueada inicialmente?" 
+                          defaultValue={false}
+                          helperText={false}
+                        />
+                        <Tooltip title="Si está bloqueada, requiere un prerequisito para desbloquearse">
+                          <IconButton size="small">
+                            <InfoOutlinedIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                      <FormDataConsumer>
+                        {({ scopedFormData }) => {
+                          const isLocked = scopedFormData?.isInitiallyLocked;
+                          return isLocked ? (
+                            <SelectInput 
+                              source="prerequisiteActionId" 
+                              label="Acción Prerequisito" 
+                              fullWidth
+                              choices={actionChoices}
+                              validate={validateRequired}
+                            />
+                          ) : null;
+                        }}
+                      </FormDataConsumer>
+                      
+                      <ArrayInput source="effects" label="Efectos sobre Dimensiones" validate={validateNotEmpty} sx={{ mt: 2 }}>
+                        <SimpleFormIterator inline>
+                          <SelectInput 
+                            source="dimensionId" 
+                            label="Dimensión Afectada" 
+                            choices={dimensionChoices}
+                            validate={validateRequired}
+                          />
+                          <NumberInput 
+                            source="delta" 
+                            label="Delta (cambio)" 
+                            step={0.05}
+                            min={-1}
+                            max={1}
+                            validate={validateDelta}
+                            helperText="Cambio: -1.0 a 1.0"
+                          />
+                        </SimpleFormIterator>
+                      </ArrayInput>
+                    </SimpleFormIterator>
+                  </ArrayInput>
+                </Box>
+              </Box>
+            );
+          }}
+        </FormDataConsumer>
       </FormTab>
 
       {/* TAB 5: EVENTS */}
