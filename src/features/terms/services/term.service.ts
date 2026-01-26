@@ -23,15 +23,16 @@ export const changeTermStatus = async (
 
 /**
  * Cambiar el estado del ciclo de vida de un período académico
- * PATCH /api/academic-terms/{id}/lifecycle-status
+ * PATCH /api/academic-terms/{id}/status
+ * El backend espera: { status: LifecycleStatus }
  */
 export const changeTermLifecycleStatus = async (
   termId: string,
   newLifecycleStatus: LifecycleStatus
 ): Promise<Term> => {
   const response = await apiService.patch<Term>(
-    `/academic-terms/${termId}/lifecycle-status`,
-    { lifecycleStatus: newLifecycleStatus }
+    `/academic-terms/${termId}/status`,
+    { status: newLifecycleStatus }
   );
   return response.json;
 };

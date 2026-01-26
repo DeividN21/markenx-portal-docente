@@ -19,7 +19,11 @@ export const TermLifecycleToggle = ({ record }: TermLifecycleToggleProps) => {
   const refresh = useRefresh();
   const notify = useNotify();
 
+  // Deshabilitar toggle si el estado es ENDED (Finalizado) o ACTIVE (En curso)
+  const isDisabled = record.status.code === 'ENDED' || record.status.code === 'ACTIVE';
+
   const handleToggleClick = () => {
+    if (isDisabled) return;
     const newStatus: LifecycleStatus = record.lifecycleStatus === 'ACTIVE' ? 'DISABLED' : 'ACTIVE';
     setPendingStatus(newStatus);
     setOpen(true);
@@ -53,27 +57,136 @@ export const TermLifecycleToggle = ({ record }: TermLifecycleToggleProps) => {
       <Switch
         checked={record.lifecycleStatus === 'ACTIVE'}
         onChange={handleToggleClick}
+        disabled={isDisabled}
         color="primary"
       />
 
-      <Dialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth>
-        <DialogTitle>Confirmación de cambio de estado</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" gutterBottom>
-            Está a punto de modificar el estado de la entidad <strong>Período Académico</strong> (<strong>{record.label}</strong>).
+      <Dialog 
+        open={open} 
+        onClose={handleCancel} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            px: 1,
+            py: 1,
+          }
+        }}
+      >
+        <DialogTitle 
+          sx={{ 
+            fontSize: '1.5rem',
+            fontWeight: 600,
+            color: 'text.primary',
+            pb: 2,
+            pt: 3,
+          }}
+        >
+          Confirmación de cambio de estado
+        </DialogTitle>
+        
+        <DialogContent sx={{ pb: 3 }}>
+          {/* Bloque 1: Descripción de la acción con entidad destacada */}
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              fontSize: '1rem',
+              lineHeight: 1.6,
+              mb: 3,
+            }}
+          >
+            Está a punto de modificar el estado del{' '}
+            <Typography 
+              component="span" 
+              sx={{ 
+                fontWeight: 600,
+                color: 'primary.main',
+              }}
+            >
+              Período Académico
+            </Typography>
+            {' '}(
+            <Typography 
+              component="span" 
+              sx={{ 
+                fontWeight: 600,
+              }}
+            >
+              {record.label}
+            </Typography>
+            ).
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+
+          {/* Bloque 2: Consecuencia de la acción */}
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              fontSize: '0.938rem',
+              color: 'text.secondary',
+              lineHeight: 1.5,
+              mb: 3,
+              py: 1.5,
+              px: 2,
+              bgcolor: 'action.hover',
+              borderRadius: 1,
+              borderLeft: 3,
+              borderColor: 'primary.main',
+            }}
+          >
             Este cambio afectará su disponibilidad dentro del sistema.
           </Typography>
-          <Typography variant="body1" sx={{ mt: 2 }}>
+
+          {/* Bloque 3: Pregunta de confirmación */}
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              fontSize: '1rem',
+              fontWeight: 500,
+              color: 'text.primary',
+            }}
+          >
             ¿Desea continuar con la acción?
           </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancel} color="inherit">
+
+        <DialogActions 
+          sx={{ 
+            px: 3, 
+            pb: 3,
+            pt: 1,
+            gap: 1.5,
+          }}
+        >
+          {/* Botón secundario: Bajo énfasis */}
+          <Button 
+            onClick={handleCancel} 
+            variant="outlined"
+            color="inherit"
+            sx={{
+              minWidth: 120,
+              textTransform: 'none',
+              fontWeight: 500,
+            }}
+          >
             Cancelar
           </Button>
-          <Button onClick={handleConfirm} variant="contained" color="primary">
+          
+          {/* Botón principal: Alto énfasis */}
+          <Button 
+            onClick={handleConfirm} 
+            variant="contained" 
+            color="primary"
+            sx={{
+              minWidth: 200,
+              textTransform: 'none',
+              fontWeight: 600,
+              boxShadow: 2,
+              '&:hover': {
+                boxShadow: 4,
+              }
+            }}
+          >
             Confirmar cambio de estado
           </Button>
         </DialogActions>

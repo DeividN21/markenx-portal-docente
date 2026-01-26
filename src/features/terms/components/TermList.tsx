@@ -31,14 +31,14 @@ export const TermList = () => (
         source="startDate"
         label="Fecha de inicio"
         locales="en-US"
-        options={{ year: 'numeric', month: '2-digit', day: '2-digit' }}
+        options={{ year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' }}
         sortable={false}
       />
       <DateField
         source="endDate"
         label="Fecha de fin"
         locales="en-US"
-        options={{ year: 'numeric', month: '2-digit', day: '2-digit' }}
+        options={{ year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' }}
         sortable={false}
       />
       <FunctionField
