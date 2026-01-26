@@ -1,22 +1,18 @@
 import { 
   Edit, 
   SimpleForm, 
-  TextInput, 
-  Toolbar, 
+  TextInput,
+  Toolbar,
   SaveButton,
   useNotify 
 } from 'react-admin';
-import { ChangeStatusButton } from '../../../components/shared/ChangeStatusButton';
 
 /**
- * Toolbar personalizado para edición de cursos
- * - Botón de guardar para actualizar nombre
- * - Botón de cambio de estado (ACTIVE ↔ DISABLED)
+ * Toolbar sin botón de eliminar
  */
 const CourseEditToolbar = () => (
   <Toolbar>
     <SaveButton />
-    <ChangeStatusButton resource="courses" />
   </Toolbar>
 );
 
@@ -25,7 +21,6 @@ const CourseEditToolbar = () => (
  * Restricciones:
  * - Solo se puede editar el nombre del curso
  * - El código no es editable
- * - El período académico se cambia vía endpoint específico (no implementado en UI aún)
  */
 export const CourseEdit = () => {
   const notify = useNotify();
@@ -44,25 +39,16 @@ export const CourseEdit = () => {
       }}
     >
       <SimpleForm toolbar={<CourseEditToolbar />}>
-        <TextInput source="id" label="ID" disabled fullWidth />
-        <TextInput 
-          source="name" 
-          label="Nombre del Curso" 
-          fullWidth 
-        />
         <TextInput 
           source="code" 
           label="Código del Curso" 
           disabled 
           fullWidth 
-          helperText="El código no puede modificarse"
         />
         <TextInput 
-          source="academicTermName" 
-          label="Período Académico" 
-          disabled 
+          source="name" 
+          label="Nombre del Curso" 
           fullWidth 
-          helperText="Para cambiar el período, use la acción correspondiente"
         />
       </SimpleForm>
     </Edit>

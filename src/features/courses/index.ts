@@ -13,7 +13,7 @@ export { CourseForm } from './components/CourseForm';
 export type { Course, CourseFormData, ChangeAcademicTermData } from './types/course.types';
 
 // Services
-export { changeCourseStatus, changeAcademicTerm } from './services/course.service';
+export { changeCourseLifecycleStatus, changeAcademicTerm } from './services/course.service';
 
 // Utils
 export { 

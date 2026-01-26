@@ -36,10 +36,22 @@ const i18nProvider = polyglotI18nProvider(() => ({
     action: {
       ...spanishMessages.ra.action,
       ...customTranslations.ra.action,
+      create: 'Crear %{name}', // Template por defecto
     },
     navigation: {
       ...spanishMessages.ra.navigation,
       ...customTranslations.ra.navigation,
+    },
+  },
+  resources: {
+    ...customTranslations.resources,
+    'academic-terms': {
+      ...customTranslations.resources['academic-terms'],
+      name: 'Período académico |||| Períodos académicos',
+    },
+    courses: {
+      ...customTranslations.resources.courses,
+      name: 'Curso |||| Cursos',
     },
   },
 }), 'es');

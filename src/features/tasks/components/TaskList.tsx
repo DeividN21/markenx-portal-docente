@@ -84,7 +84,7 @@ export const TaskList = () => (
         sortable={false}
       />
 
-      <StatusChip source="status" label="Estado" sortable={false} />
+      <StatusChip source="status" label="Estado" />
       
       <EditButton />
     </Datagrid>

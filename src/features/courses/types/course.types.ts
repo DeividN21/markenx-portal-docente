@@ -7,9 +7,8 @@ export interface Course {
   id: string;
   name: string;
   code: string;
-  academicTermId: string;
-  academicTermName?: string; // Datos denormalizados del backend
-  status: LifecycleStatus;
+  termId: string;
+  lifecycleStatus: LifecycleStatus;
 }
 
 /**

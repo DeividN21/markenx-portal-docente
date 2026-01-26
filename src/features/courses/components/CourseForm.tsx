@@ -2,7 +2,7 @@ import { TextInput, ReferenceInput, SelectInput, required } from 'react-admin';
 
 /**
  * Formulario compartido para crear/editar cursos
- * Campos editables: name, code, academicTermId
+ * Campos: name, academicTermId
  */
 export const CourseForm = () => (
   <>
@@ -11,24 +11,17 @@ export const CourseForm = () => (
       label="Nombre del Curso" 
       fullWidth 
       validate={required()}
-      helperText="Ej: Introducción a la Programación"
-    />
-    <TextInput 
-      source="code" 
-      label="Código del Curso" 
-      fullWidth 
-      validate={required()}
-      helperText="Ej: CS101"
     />
     <ReferenceInput 
       source="academicTermId" 
-      reference="academic-terms" 
-      label="Período Académico"
+      reference="academic-terms"
     >
       <SelectInput 
-        optionText="name" 
+        label="Período Académico"
+        optionText="label" 
         validate={required()} 
         fullWidth 
+        placeholder="Período académico"
       />
     </ReferenceInput>
   </>

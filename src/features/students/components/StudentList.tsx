@@ -22,7 +22,7 @@ export const StudentList: React.FC = () => {
         <ReferenceField source="courseId" reference="courses" label="Curso" sortable={false}>
           <TextField source="name" />
         </ReferenceField>
-        <StatusChip source="status" label="Estado" sortable={false} />
+        <StatusChip source="status" label="Estado" />
         <EditButton />
       </Datagrid>
     </List>

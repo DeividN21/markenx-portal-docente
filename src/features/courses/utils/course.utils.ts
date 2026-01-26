@@ -23,7 +23,7 @@ export const canChangeStatus = (_course: Course): boolean => {
  * Solo cursos ACTIVE pueden cambiar de período
  */
 export const canChangeAcademicTerm = (course: Course): boolean => {
-  return course.status === 'ACTIVE';
+  return course.lifecycleStatus === 'ACTIVE';
 };
 
 /**
@@ -40,7 +40,7 @@ export const validateCourseData = (data: Partial<Course>): string[] => {
     errors.push('El código es obligatorio');
   }
 
-  if (!data.academicTermId) {
+  if (!data.termId) {
     errors.push('Debe seleccionar un período académico');
   }
 

@@ -2,10 +2,11 @@ import {
   List, 
   Datagrid, 
   TextField, 
-  ReferenceField, 
-  EditButton
+  EditButton,
+  FunctionField
 } from 'react-admin';
-import { StatusChip } from '../../../components/ui/StatusChip';
+import type { Course } from '../types/course.types';
+import { CourseLifecycleToggle } from './CourseLifecycleToggle';
 
 /**
  * Componente de lista de cursos
@@ -16,20 +17,32 @@ export const CourseList = () => (
     sort={{ field: 'name', order: 'ASC' }}
     perPage={25}
   >
-    <Datagrid rowClick="edit" bulkActionButtons={false}>
-      <TextField source="name" label="Nombre del Curso" sortable={false} />
+    <Datagrid 
+      rowClick={false} 
+      bulkActionButtons={false}
+      sx={{
+        '& .RaDatagrid-headerCell': {
+          textAlign: 'center',
+        },
+        '& .RaDatagrid-rowCell': {
+          textAlign: 'center',
+        }
+      }}
+    >
       <TextField source="code" label="Código" sortable={false} />
-      <ReferenceField 
-        source="academicTermId" 
-        reference="academic-terms" 
-        label="Período Académico"
-        link={false}
+      <TextField source="name" label="Nombre" sortable={false} />
+      <FunctionField
+        label="Acciones"
         sortable={false}
-      >
-        <TextField source="name" />
-      </ReferenceField>
-      <StatusChip source="status" label="Estado" />
-      <EditButton />
+        render={(record: Course) => <EditButton />}
+      />
+      <FunctionField
+        label=""
+        sortable={false}
+        render={(record: Course) => (
+          <CourseLifecycleToggle record={record} />
+        )}
+      />
     </Datagrid>
   </List>
 );

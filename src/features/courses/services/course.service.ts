@@ -7,15 +7,15 @@ import type { LifecycleStatus } from '../../../types/lifecycle.types';
  */
 
 /**
- * Cambiar el estado de un curso (ACTIVE ↔ DISABLED)
+ * Cambiar el estado del ciclo de vida de un curso
  * PATCH /api/courses/{id}/status
  */
-export const changeCourseStatus = async (
+export const changeCourseLifecycleStatus = async (
   courseId: string,
   newStatus: LifecycleStatus
 ): Promise<Course> => {
   const response = await apiService.patch<Course>(
-    `/api/courses/${courseId}/status`,
+    `/courses/${courseId}/status`,
     { status: newStatus }
   );
   return response.json;

@@ -6,12 +6,21 @@
 export const customTranslations = {
   ra: {
     action: {
-      create: 'Nuevo periodo académico',
       export: 'Exportar CSV',
       edit: 'Editar',
     },
     navigation: {
       page_rows_per_page: 'Registros por página',
+    },
+  },
+  resources: {
+    'academic-terms': {
+      name: 'Período |||| Períodos',
+      fields: {},
+    },
+    courses: {
+      name: 'Curso |||| Cursos',
+      fields: {},
     },
   },
 };
