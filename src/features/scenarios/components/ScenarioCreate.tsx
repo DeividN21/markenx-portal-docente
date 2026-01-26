@@ -9,10 +9,13 @@ import { scenarioTemplate } from '../utils/scenarioTemplate';
  */
 const ScenarioCreateToolbar = (props: any) => {
   const notify = useNotify();
-  const { reset } = useFormContext();
+  const { setValue } = useFormContext();
   
   const handleApplyTemplate = () => {
-    reset(scenarioTemplate);
+    // Apply all template values using setValue to mark form as dirty
+    Object.entries(scenarioTemplate).forEach(([key, value]) => {
+      setValue(key, value, { shouldDirty: true, shouldValidate: true });
+    });
     notify('Plantilla aplicada correctamente. Revise las pestañas para ver los datos cargados.', { type: 'success' });
   };
 
@@ -38,19 +41,59 @@ export const ScenarioCreate = () => {
 
   // Transform data before submit
   const transform = (data: any) => {
-    // Combine all actions from different categories into single array
-    const actions = [
+    // Generate temporary IDs for dimensions
+    const dimensions = (data.dimensions || []).map((dim: any, index: number) => ({
+      ...dim,
+      id: `temp_dim_${index}_${Date.now()}`
+    }));
+
+    // Generate temporary IDs for events
+    const events = (data.events || []).map((event: any, index: number) => ({
+      ...event,
+      id: `temp_event_${index}_${Date.now()}`
+    }));
+
+    // Generate temporary ID for consumer
+    const consumer = data.consumer ? {
+      ...data.consumer,
+      id: `temp_consumer_${Date.now()}`
+    } : undefined;
+
+    // Combine all actions from different categories into single array with temporary IDs
+    const allActions = [
       ...(data.productionActions || []).map((action: any) => ({ ...action, category: 'PRODUCTION' })),
       ...(data.priceActions || []).map((action: any) => ({ ...action, category: 'PRICE' })),
-      ...(data.placeActions || []).map((action: any) => ({ ...action, category: 'PLACE' })),
+      ...(data.placeActions || []).map((action: any) => ({ ...action, category: 'PLACEMENT' })),
       ...(data.promotionActions || []).map((action: any) => ({ ...action, category: 'PROMOTION' }))
     ];
+
+    // Create a map of action names to temporary IDs
+    const nameToIdMap = new Map<string, string>();
+    allActions.forEach((action, index) => {
+      const tempId = `temp_action_${index}_${Date.now()}`;
+      nameToIdMap.set(action.name, tempId);
+      action.id = tempId;
+    });
+
+    // Replace prerequisiteActionId names with their corresponding temporary IDs
+    const actions = allActions.map(action => {
+      if (action.prerequisiteActionId && nameToIdMap.has(action.prerequisiteActionId)) {
+        return {
+          ...action,
+          prerequisiteActionId: nameToIdMap.get(action.prerequisiteActionId)
+        };
+      }
+      return action;
+    });
 
     // Remove temporary action arrays
     const { productionActions, priceActions, placeActions, promotionActions, ...rest } = data;
 
     return {
       ...rest,
+      consumer,
+      dimensions,
+      events,
       actions
     };
   };

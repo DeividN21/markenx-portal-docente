@@ -43,8 +43,8 @@ const ACTION_CATEGORIES = {
     description: 'Estrategias de pricing y políticas de precios',
     examples: 'Descuentos, promociones, ajustes de precio, financiamiento'
   },
-  PLACE: {
-    key: 'PLACE',
+  PLACEMENT: {
+    key: 'PLACEMENT',
     label: 'Plaza (Distribución)',
     description: 'Canales de distribución y puntos de venta',
     examples: 'Expandir canales, venta online, distribuidores, logística'
@@ -287,7 +287,8 @@ export const ScenarioForm = ({ toolbar }: { toolbar?: React.ReactElement }) => {
                 </Tabs>
 
                 {/* PRODUCTION ACTIONS */}
-                <Box hidden={activeTab !== 0}>
+                {activeTab === 0 && (
+                  <Box>
                   <Alert severity="success" sx={{ mb: 2 }}>
                     <Typography variant="body2">
                       <strong>{ACTION_CATEGORIES.PRODUCTION.label}</strong><br/>
@@ -357,7 +358,6 @@ export const ScenarioForm = ({ toolbar }: { toolbar?: React.ReactElement }) => {
                               label="Acción Prerequisito" 
                               fullWidth
                               choices={actionChoices}
-                              validate={validateRequired}
                             />
                           ) : null;
                         }}
@@ -384,10 +384,12 @@ export const ScenarioForm = ({ toolbar }: { toolbar?: React.ReactElement }) => {
                       </ArrayInput>
                     </SimpleFormIterator>
                   </ArrayInput>
-                </Box>
+                  </Box>
+                )}
 
                 {/* PRICE ACTIONS */}
-                <Box hidden={activeTab !== 1}>
+                {activeTab === 1 && (
+                  <Box>
                   <Alert severity="success" sx={{ mb: 2 }}>
                     <Typography variant="body2">
                       <strong>{ACTION_CATEGORIES.PRICE.label}</strong><br/>
@@ -457,7 +459,6 @@ export const ScenarioForm = ({ toolbar }: { toolbar?: React.ReactElement }) => {
                               label="Acción Prerequisito" 
                               fullWidth
                               choices={actionChoices}
-                              validate={validateRequired}
                             />
                           ) : null;
                         }}
@@ -484,15 +485,17 @@ export const ScenarioForm = ({ toolbar }: { toolbar?: React.ReactElement }) => {
                       </ArrayInput>
                     </SimpleFormIterator>
                   </ArrayInput>
-                </Box>
+                  </Box>
+                )}
 
                 {/* PLACE ACTIONS */}
-                <Box hidden={activeTab !== 2}>
+                {activeTab === 2 && (
+                  <Box>
                   <Alert severity="success" sx={{ mb: 2 }}>
                     <Typography variant="body2">
-                      <strong>{ACTION_CATEGORIES.PLACE.label}</strong><br/>
-                      {ACTION_CATEGORIES.PLACE.description}<br/>
-                      <em>Ejemplos: {ACTION_CATEGORIES.PLACE.examples}</em>
+                      <strong>{ACTION_CATEGORIES.PLACEMENT.label}</strong><br/>
+                      {ACTION_CATEGORIES.PLACEMENT.description}<br/>
+                      <em>Ejemplos: {ACTION_CATEGORIES.PLACEMENT.examples}</em>
                     </Typography>
                   </Alert>
                   
@@ -557,13 +560,12 @@ export const ScenarioForm = ({ toolbar }: { toolbar?: React.ReactElement }) => {
                               label="Acción Prerequisito" 
                               fullWidth
                               choices={actionChoices}
-                              validate={validateRequired}
                             />
                           ) : null;
                         }}
                       </FormDataConsumer>
                       
-                      <ArrayInput source="effects" label="Efectos sobre Dimensiones" validate={validateNotEmpty} sx={{ mt: 3 }}>
+                      <ArrayInput source="effects" label="Efectos sobre Dimensiones" validate={validateNotEmpty} sx={{ mt: 2 }}>
                         <SimpleFormIterator inline>
                           <SelectInput 
                             source="dimensionId" 
@@ -584,10 +586,12 @@ export const ScenarioForm = ({ toolbar }: { toolbar?: React.ReactElement }) => {
                       </ArrayInput>
                     </SimpleFormIterator>
                   </ArrayInput>
-                </Box>
+                  </Box>
+                )}
 
                 {/* PROMOTION ACTIONS */}
-                <Box hidden={activeTab !== 3}>
+                {activeTab === 3 && (
+                  <Box>
                   <Alert severity="success" sx={{ mb: 2 }}>
                     <Typography variant="body2">
                       <strong>{ACTION_CATEGORIES.PROMOTION.label}</strong><br/>
@@ -657,7 +661,6 @@ export const ScenarioForm = ({ toolbar }: { toolbar?: React.ReactElement }) => {
                               label="Acción Prerequisito" 
                               fullWidth
                               choices={actionChoices}
-                              validate={validateRequired}
                             />
                           ) : null;
                         }}
@@ -684,7 +687,8 @@ export const ScenarioForm = ({ toolbar }: { toolbar?: React.ReactElement }) => {
                       </ArrayInput>
                     </SimpleFormIterator>
                   </ArrayInput>
-                </Box>
+                  </Box>
+                )}
               </Box>
             );
           }}
@@ -697,57 +701,75 @@ export const ScenarioForm = ({ toolbar }: { toolbar?: React.ReactElement }) => {
           <Typography variant="body2">
             <strong>Eventos del Mercado</strong><br/>
             Factores externos que alteran temporalmente la importancia de ciertas dimensiones (tendencias, crisis, noticias).<br/>
-            • <strong>weightMultiplier</strong>: Multiplicador de importancia (1.5 = aumenta importancia 50%, 0.8 = reduce 20%)<br/>
+            • <strong>Multiplicador de importancia</strong>: Altera el peso de una dimensión (1.5 = aumenta 50%, 0.8 = reduce 20%)<br/>
             • Los eventos simulan cambios en el contexto del mercado
           </Typography>
         </Alert>
         
-        <ArrayInput source="events" label="Eventos Aleatorios" validate={validateNotEmpty}>
-          <SimpleFormIterator>
-            <TextInput 
-              source="id" 
-              label="ID" 
-              fullWidth
-              validate={validateRequired}
-              helperText="UUID único para este evento"
-            />
-            <TextInput 
-              source="title" 
-              label="Título del Evento" 
-              fullWidth
-              validate={validateRequired}
-              helperText="Nombre visible: 'Competidor lanza producto similar', 'Reseña viral positiva'"
-            />
-            <TextInput 
-              source="description" 
-              label="Descripción" 
-              fullWidth
-              multiline 
-              rows={2}
-              validate={validateRequired}
-              helperText="Contexto del evento y su impacto en el mercado"
-            />
+        <FormDataConsumer>
+          {({ formData }) => {
+            const dimensionChoices = (formData.dimensions || []).map((dim: any) => ({
+              id: dim.name,
+              name: dim.displayName
+            }));
             
-            <ArrayInput source="effects" label="Efectos del Evento" validate={validateNotEmpty}>
-              <SimpleFormIterator inline>
-                <TextInput 
-                  source="dimensionId" 
-                  label="ID de Dimensión" 
-                  validate={validateRequired}
-                  helperText="UUID de la dimensión afectada"
-                />
-                <NumberInput 
-                  source="weightMultiplier" 
-                  label="Multiplicador de Importancia" 
-                  step={0.1}
-                  min={0}
-                  validate={validateWeightMultiplier}
-                  helperText="Mínimo 0. Ejemplo: 1.5 = +50% importancia, 0.8 = -20% importancia"
-                />
-              </SimpleFormIterator>
-            </ArrayInput>
-          </SimpleFormIterator>
-        </ArrayInput>
+            return (
+              <ArrayInput source="events" label="Eventos Aleatorios" validate={validateNotEmpty}>
+                <SimpleFormIterator
+                  inline={false}
+                  disableReordering={false}
+                  sx={{
+                    '& .RaSimpleFormIterator-line': {
+                      border: '1px solid #e0e0e0',
+                      borderRadius: 1,
+                      padding: 2,
+                      marginBottom: 2,
+                      backgroundColor: '#fafafa'
+                    }
+                  }}
+                >
+                  <TextInput 
+                    source="title" 
+                    label="Título del Evento" 
+                    fullWidth
+                    validate={validateRequired}
+                    helperText="Nombre visible del evento"
+                  />
+                  <TextInput 
+                    source="description" 
+                    label="Descripción" 
+                    fullWidth
+                    multiline 
+                    rows={2}
+                    validate={validateRequired}
+                    helperText="Contexto del evento y su impacto en el mercado"
+                  />
+                  
+                  <ArrayInput source="effects" label="Efectos del Evento" validate={validateNotEmpty} sx={{ mt: 2 }}>
+                    <SimpleFormIterator inline>
+                      <SelectInput 
+                        source="dimensionId" 
+                        label="Dimensión Afectada" 
+                        choices={dimensionChoices}
+                        validate={validateRequired}
+                        fullWidth
+                      />
+                      <NumberInput 
+                        source="weightMultiplier" 
+                        label="Multiplicador de Importancia" 
+                        step={0.1}
+                        min={0}
+                        fullWidth
+                        validate={validateWeightMultiplier}
+                        helperText="Ejemplo: 1.5 = +50%, 0.8 = -20%"
+                      />
+                    </SimpleFormIterator>
+                  </ArrayInput>
+                </SimpleFormIterator>
+              </ArrayInput>
+            );
+          }}
+        </FormDataConsumer>
       </FormTab>
     </TabbedForm>
   );

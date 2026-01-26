@@ -208,7 +208,6 @@ export const scenarioTemplate = {
   ],
   events: [
     {
-      id: "h3i4j5k6-l7m8-9012-nopq-345678901234",
       title: "El Mundo Se Vuelve Más Verde",
       description: "Impulso global por la sostenibilidad gana fuerza en los medios",
       effects: [
@@ -219,7 +218,6 @@ export const scenarioTemplate = {
       ]
     },
     {
-      id: "i4j5k6l7-m8n9-0123-pqrs-456789012345",
       title: "Crisis Económica",
       description: "Recesión económica aumenta la sensibilidad al precio del consumidor",
       effects: [
