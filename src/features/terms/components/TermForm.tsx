@@ -27,17 +27,32 @@ export const TermForm = () => {
       <FormDataConsumer>
         {({ formData }) => {
           // Calcular año automáticamente si hay fechas
-          const autoYear = formData.startDate && formData.endDate 
-            ? calculatePeriodYear(formData.startDate, formData.endDate)
-            : new Date().getFullYear();
+          if (!formData.startDate || !formData.endDate) {
+            return null;
+          }
+
+          const startYear = new Date(formData.startDate).getFullYear();
+          const endYear = new Date(formData.endDate).getFullYear();
+          const autoYear = calculatePeriodYear(formData.startDate, formData.endDate);
           
+          // Si están en el mismo año, enviar el valor calculado como campo oculto
+          if (startYear === endYear) {
+            return (
+              <NumberInput 
+                source="year" 
+                defaultValue={autoYear}
+                style={{ display: 'none' }}
+              />
+            );
+          }
+          
+          // Si están en años diferentes, mostrar el campo para edición
           return (
             <NumberInput 
               source="year" 
               label="Año del Período" 
               fullWidth 
               validate={required()}
-              helperText={`Se calcula automáticamente basado en las fechas${formData.startDate && formData.endDate ? `: ${autoYear}` : ''}. Edítalo solo si es necesario.`}
               defaultValue={autoYear}
             />
           );

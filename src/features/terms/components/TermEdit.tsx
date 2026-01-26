@@ -1,8 +1,9 @@
 import { Edit, SimpleForm, TextInput, Toolbar, SaveButton, useRecordContext, useNotify } from 'react-admin';
 import { TermForm } from './TermForm';
 import { TermChangeStatusButton } from './TermChangeStatusButton';
-import type { Term } from '../types/term.types';
+import type { Term, TermFormData } from '../types/term.types';
 import { canEdit } from '../utils/term.utils';
+import { transformTermForUpdate } from '../utils/term.transform';
 
 /**
  * Toolbar personalizado para edición de términos
@@ -33,6 +34,7 @@ export const TermEdit = () => {
   return (
     <Edit
       mutationMode="pessimistic"
+      transform={transformTermForUpdate}
       mutationOptions={{
         onError: (error) => {
           const apiError = error as { body?: { userMessage?: string } };
@@ -44,7 +46,7 @@ export const TermEdit = () => {
       }}
     >
       <SimpleForm toolbar={<TermEditToolbar />}>
-        <TextInput source="id" label="ID" disabled fullWidth />
+        <TextInput source="label" label="Período" disabled fullWidth />
         <TermForm />
       </SimpleForm>
     </Edit>
