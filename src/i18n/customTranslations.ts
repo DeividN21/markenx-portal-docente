@@ -22,5 +22,9 @@ export const customTranslations = {
       name: 'Curso |||| Cursos',
       fields: {},
     },
+    students: {
+      name: 'Estudiante |||| Estudiantes',
+      fields: {},
+    },
   },
 };

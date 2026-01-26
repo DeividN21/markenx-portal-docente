@@ -1,4 +1,3 @@
-import React from 'react';
 import { 
   SimpleForm, 
   TextInput, 
@@ -13,10 +12,11 @@ const validateRequired = [required()];
 const validateEmail = [required(), email('Correo inválido')];
 
 /**
- * Student form component
- * Used by both StudentCreate and StudentEdit
+ * Student creation form component
+ * Includes all fields required for student creation: firstName, lastName, email, courseId
+ * For editing, use StudentEditForm which excludes the email field
  */
-export const StudentForm: React.FC = () => {
+export const StudentForm = () => {
   return (
     <SimpleForm>
       {/* @ts-ignore - MUI v7 Grid compatibility - item and xs props are valid but TypeScript definitions may be outdated */}

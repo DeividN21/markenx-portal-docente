@@ -1,11 +1,10 @@
-import React from 'react';
 import { Create, useNotify } from 'react-admin';
 import { StudentForm } from './StudentForm';
 
 /**
  * Student creation component
  */
-export const StudentCreate: React.FC = () => {
+export const StudentCreate = () => {
   const notify = useNotify();
 
   return (

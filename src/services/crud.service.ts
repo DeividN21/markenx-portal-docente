@@ -5,6 +5,7 @@
 
 import { apiService } from './api.service';
 import type { PaginatedResponse } from '../types/common.types';
+import { normalizeList } from '../utils/normalizers';
 
 interface ListParams {
   page: number;
@@ -44,7 +45,7 @@ export const crudService = {
     if (json && typeof json === 'object' && 'content' in json) {
       const paginatedResponse = json as PaginatedResponse<T>;
       return {
-        data: paginatedResponse.content,
+        data: normalizeList(paginatedResponse.content as Record<string, unknown>[]),
         total: paginatedResponse.totalElements,
       };
     }
@@ -52,7 +53,7 @@ export const crudService = {
     // Manejo de lista simple
     if (Array.isArray(json)) {
       return {
-        data: json,
+        data: normalizeList(json as Record<string, unknown>[]),
         total: json.length,
       };
     }

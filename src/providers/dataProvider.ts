@@ -16,13 +16,14 @@ export const dataProvider: DataProvider = {
    * Obtener lista de recursos (paginada)
    */
   getList: async (resource, params) => {
+    // @ts-ignore - Conflict entre genéricos de React-Admin y normalización
     return crudService.list(resource, {
       page: params.pagination?.page || 1,
       perPage: params.pagination?.perPage || 10,
       sortField: params.sort?.field || 'id',
       sortOrder: params.sort?.order || 'ASC',
       filter: params.filter,
-    });
+    }) as any;
   },
 
   /**
@@ -50,6 +51,7 @@ export const dataProvider: DataProvider = {
    * Obtener lista referenciada (ej: tareas de un curso)
    */
   getManyReference: async (resource, params) => {
+    // @ts-ignore - Conflict entre genéricos de React-Admin y normalización
     return crudService.list(resource, {
       page: params.pagination.page,
       perPage: params.pagination.perPage,
@@ -59,7 +61,7 @@ export const dataProvider: DataProvider = {
         ...params.filter,
         [params.target]: params.id,
       },
-    });
+    }) as any;
   },
 
   /**

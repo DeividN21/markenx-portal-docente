@@ -1,29 +1,16 @@
-import React from 'react';
-import { Edit, TopToolbar, useNotify } from 'react-admin';
-import { StudentForm } from './StudentForm';
-import { ChangeStatusButton } from '../../../components/shared/ChangeStatusButton';
-
-/**
- * Edit toolbar with status change button
- */
-const StudentEditToolbar: React.FC = () => {
-  return (
-    <TopToolbar>
-      <ChangeStatusButton resource="students" />
-    </TopToolbar>
-  );
-};
+import { Edit, useNotify } from 'react-admin';
+import { StudentEditForm } from './StudentEditForm';
 
 /**
  * Student edit component
+ * Uses StudentEditForm which only includes updatable fields (firstName, lastName, courseId)
  */
-export const StudentEdit: React.FC = () => {
+export const StudentEdit = () => {
   const notify = useNotify();
 
   return (
     <Edit 
-      title="Editar Estudiante" 
-      actions={<StudentEditToolbar />}
+      title="Editar Estudiante"
       mutationMode="pessimistic"
       mutationOptions={{
         onError: (error) => {
@@ -35,7 +22,7 @@ export const StudentEdit: React.FC = () => {
         },
       }}
     >
-      <StudentForm />
+      <StudentEditForm />
     </Edit>
   );
 };

@@ -9,8 +9,8 @@
 export const normalizeEntity = <T extends Record<string, unknown>>(item: T): T & { id: string } => {
   return {
     ...item,
-    // Asegurar que siempre haya un id (por si viene como studentId, etc.)
-    id: (item.id || item.studentId || item.taskId || item.courseId || item.attemptId) as string,
+    // Asegurar que siempre haya un id (algunos endpoints pueden usar IDs específicos)
+    id: (item.id || item.taskId || item.attemptId) as string,
   };
 };
 

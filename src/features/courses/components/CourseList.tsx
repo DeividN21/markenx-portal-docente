@@ -34,7 +34,7 @@ export const CourseList = () => (
       <FunctionField
         label="Acciones"
         sortable={false}
-        render={(record: Course) => <EditButton />}
+        render={() => <EditButton />}
       />
       <FunctionField
         label=""

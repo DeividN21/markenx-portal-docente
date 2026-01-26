@@ -1,30 +1,41 @@
-import React from 'react';
 import { 
   List, 
   Datagrid, 
   TextField, 
-  EmailField, 
-  ReferenceField,
-  EditButton
+  EmailField,
+  EditButton,
+  FunctionField
 } from 'react-admin';
-import { StatusChip } from '../../../components/ui/StatusChip';
 
 /**
  * Student list component
- * Displays all students with their courses and status
+ * Displays all students
  */
-export const StudentList: React.FC = () => {
-  return (
-    <List title="Estudiantes">
-      <Datagrid rowClick="edit">
-        <TextField source="fullName" label="Nombre Completo" sortable={false} />
-        <EmailField source="email" label="Email" sortable={false} />
-        <ReferenceField source="courseId" reference="courses" label="Curso" sortable={false}>
-          <TextField source="name" />
-        </ReferenceField>
-        <StatusChip source="status" label="Estado" />
-        <EditButton />
-      </Datagrid>
-    </List>
-  );
-};
+export const StudentList = () => (
+  <List
+    title="Estudiantes"
+    sort={{ field: 'fullName', order: 'ASC' }}
+    perPage={25}
+  >
+    <Datagrid 
+      rowClick={false} 
+      bulkActionButtons={false}
+      sx={{
+        '& .RaDatagrid-headerCell': {
+          textAlign: 'center',
+        },
+        '& .RaDatagrid-rowCell': {
+          textAlign: 'center',
+        }
+      }}
+    >
+      <TextField source="fullName" label="Nombre Completo" sortable={false} />
+      <EmailField source="email" label="Email" sortable={false} />
+      <FunctionField
+        label="Acciones"
+        sortable={false}
+        render={() => <EditButton />}
+      />
+    </Datagrid>
+  </List>
+);
