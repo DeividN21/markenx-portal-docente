@@ -27,7 +27,23 @@ import { TermList, TermCreate, TermEdit } from "./features/terms";
 
 // CONFIGURACIÓN
 
-const i18nProvider = polyglotI18nProvider(() => spanishMessages, "es");
+// Personalizar mensajes en español
+const customSpanishMessages = {
+  ...spanishMessages,
+  ra: {
+    ...spanishMessages.ra,
+    action: {
+      ...spanishMessages.ra.action,
+      export: 'Exportar CSV',
+    },
+    navigation: {
+      ...spanishMessages.ra.navigation,
+      page_rows_per_page: 'N# de registros',
+    },
+  },
+};
+
+const i18nProvider = polyglotI18nProvider(() => customSpanishMessages, "es");
 
 const App = () => (
   <Admin

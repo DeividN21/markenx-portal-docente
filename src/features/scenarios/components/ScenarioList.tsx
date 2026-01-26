@@ -15,8 +15,8 @@ export const ScenarioList: React.FC = () => {
   return (
     <List title="Biblioteca de Escenarios">
       <Datagrid rowClick="edit">
-        <TextField source="name" label="Nombre" />
-        <TextField source="description" label="Descripción" />
+        <TextField source="name" label="Nombre" sortable={false} />
+        <TextField source="description" label="Descripción" sortable={false} />
         <EditButton />
         <DeleteButton />
       </Datagrid>

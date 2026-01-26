@@ -17,13 +17,14 @@ export const CourseList = () => (
     perPage={25}
   >
     <Datagrid rowClick="edit" bulkActionButtons={false}>
-      <TextField source="name" label="Nombre del Curso" />
-      <TextField source="code" label="Código" />
+      <TextField source="name" label="Nombre del Curso" sortable={false} />
+      <TextField source="code" label="Código" sortable={false} />
       <ReferenceField 
         source="academicTermId" 
         reference="academic-terms" 
         label="Período Académico"
         link={false}
+        sortable={false}
       >
         <TextField source="name" />
       </ReferenceField>

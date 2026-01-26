@@ -24,13 +24,14 @@ export const TaskList = () => (
     perPage={25}
   >
     <Datagrid rowClick="edit" bulkActionButtons={false}>
-      <TextField source="title" label="Título" />
+      <TextField source="title" label="Título" sortable={false} />
       
       <ReferenceField 
         source="courseId" 
         reference="courses" 
         label="Curso"
         link={false}
+        sortable={false}
       >
         <TextField source="name" />
       </ReferenceField>
@@ -40,6 +41,7 @@ export const TaskList = () => (
         reference="scenarios" 
         label="Escenario Vinculado"
         link={false}
+        sortable={false}
       >
         <TextField source="title" />
       </ReferenceField>
@@ -56,14 +58,16 @@ export const TaskList = () => (
           hour: '2-digit',
           minute: '2-digit'
         }}
+        sortable={false}
       />
       
       <FunctionField
         label="Nota Mínima"
         render={(record: Task) => formatScore(record.minScoreToPass)}
+        sortable={false}
       />
       
-      <NumberField source="maxAttempts" label="Intentos" />
+      <NumberField source="maxAttempts" label="Intentos" sortable={false} />
       
       <FunctionField
         label="Tipo"
@@ -77,9 +81,10 @@ export const TaskList = () => (
             />
           );
         }}
+        sortable={false}
       />
 
-      <StatusChip source="status" label="Estado" />
+      <StatusChip source="status" label="Estado" sortable={false} />
       
       <EditButton />
     </Datagrid>

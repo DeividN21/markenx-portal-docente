@@ -1,7 +1,7 @@
 import { Edit, SimpleForm, TextInput, Toolbar, SaveButton, useRecordContext, useNotify } from 'react-admin';
 import { TermForm } from './TermForm';
 import { TermChangeStatusButton } from './TermChangeStatusButton';
-import type { Term, TermFormData } from '../types/term.types';
+import type { Term } from '../types/term.types';
 import { canEdit } from '../utils/term.utils';
 import { transformTermForUpdate } from '../utils/term.transform';
 
