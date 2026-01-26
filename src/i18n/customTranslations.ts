@@ -8,6 +8,8 @@ export const customTranslations = {
     action: {
       export: 'Exportar CSV',
       edit: 'Editar',
+      move_up: 'Mover arriba',
+      move_down: 'Mover abajo',
     },
     navigation: {
       page_rows_per_page: 'Registros por página',

@@ -1,11 +1,39 @@
-import React from 'react';
-import { Create, useNotify } from 'react-admin';
+import { Create, useNotify, Toolbar, SaveButton, Button } from 'react-admin';
+import { useFormContext } from 'react-hook-form';
+import { AutoFixHigh as TemplateIcon } from '@mui/icons-material';
 import { ScenarioForm } from './ScenarioForm';
+import { scenarioTemplate } from '../utils/scenarioTemplate';
+
+/**
+ * Custom toolbar with template button
+ */
+const ScenarioCreateToolbar = (props: any) => {
+  const notify = useNotify();
+  const { reset } = useFormContext();
+  
+  const handleApplyTemplate = () => {
+    reset(scenarioTemplate);
+    notify('Plantilla aplicada correctamente. Revise las pestañas para ver los datos cargados.', { type: 'success' });
+  };
+
+  return (
+    <Toolbar {...props}>
+      <SaveButton />
+      <Button
+        label="Aplicar Plantilla"
+        onClick={handleApplyTemplate}
+        startIcon={<TemplateIcon />}
+        variant="outlined"
+        sx={{ ml: 2 }}
+      />
+    </Toolbar>
+  );
+};
 
 /**
  * Scenario creation component
  */
-export const ScenarioCreate: React.FC = () => {
+export const ScenarioCreate = () => {
   const notify = useNotify();
 
   return (
@@ -22,7 +50,7 @@ export const ScenarioCreate: React.FC = () => {
         },
       }}
     >
-      <ScenarioForm />
+      <ScenarioForm toolbar={<ScenarioCreateToolbar />} />
     </Create>
   );
 };

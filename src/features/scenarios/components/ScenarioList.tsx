@@ -1,25 +1,40 @@
-import React from 'react';
 import { 
   List, 
   Datagrid, 
-  TextField, 
-  EditButton,
-  DeleteButton
+  TextField,
+  ShowButton,
+  FunctionField
 } from 'react-admin';
 
 /**
  * Scenario list component
  * Displays all game scenarios
  */
-export const ScenarioList: React.FC = () => {
-  return (
-    <List title="Biblioteca de Escenarios">
-      <Datagrid rowClick="edit">
-        <TextField source="name" label="Nombre" sortable={false} />
-        <TextField source="description" label="Descripción" sortable={false} />
-        <EditButton />
-        <DeleteButton />
-      </Datagrid>
-    </List>
-  );
-};
+export const ScenarioList = () => (
+  <List
+    title="Biblioteca de Escenarios"
+    sort={{ field: 'title', order: 'ASC' }}
+    perPage={25}
+  >
+    <Datagrid 
+      rowClick={false} 
+      bulkActionButtons={false}
+      sx={{
+        '& .RaDatagrid-headerCell': {
+          textAlign: 'center',
+        },
+        '& .RaDatagrid-rowCell': {
+          textAlign: 'center',
+        }
+      }}
+    >
+      <TextField source="title" label="Título" sortable={false} />
+      <TextField source="description" label="Descripción" sortable={false} />
+      <FunctionField
+        label="Acciones"
+        sortable={false}
+        render={() => <ShowButton label="Ver" />}
+      />
+    </Datagrid>
+  </List>
+);
